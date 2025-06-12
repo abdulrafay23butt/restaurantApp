@@ -5,7 +5,7 @@ import styles from './Login.module.css';
 const roles = ['Customer', 'Manager', 'Admin'];
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(roles[0]);
   const navigate = useNavigate();
@@ -17,37 +17,32 @@ function Login() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-        </div>
-        <div>
-          <label>Role:</label>
-          {roles.map(r => (
-            <label key={r} style={{ marginLeft: 10 }}>
-              <input
-                type="radio"
-                value={r}
-                checked={role === r}
-                onChange={() => setRole(r)}
-                name="role"
-              />
-              {r}
-            </label>
-          ))}
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <button className={styles.switchBtn} onClick={() => navigate('/signup')}>
-        Don't have an account? Signup
-      </button>
+    <div className={styles.loginBg}>
+      <div className={styles.loginContainer}>
+        <h2>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Email:</label>
+            <input type="text" value={email} onChange={e => setEmail(e.target.value)} required />
+          </div>
+          <div>
+            <label>Password:</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </div>
+          <div>
+            <label>Role:</label>
+            <select value={role} onChange={e => setRole(e.target.value)}>
+              {roles.map(r => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          <button type="submit">Login</button>
+        </form>
+        <button className={styles.switchBtn} onClick={() => navigate('/signup')}>
+          Don't have an account? Signup
+        </button>
+      </div>
     </div>
   );
 }

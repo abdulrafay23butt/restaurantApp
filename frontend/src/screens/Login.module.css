@@ -1,5 +1,17 @@
+.loginBg {
+  min-height: 100vh;
+  width: 100vw;
+  background: url('../../public/bgimg.jpg');
+  background-blend-mode: lighten;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 
 .loginContainer {
   max-width: 450px;
+  min-width: 30%;
   margin: 40px auto;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -55,4 +67,11 @@
 .switchBtn:hover {
   background: #ffd180;
   color: #a0522d;
-} 
+}
+.loginContainer select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
