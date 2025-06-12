@@ -36,3 +36,5 @@
     transform: rotate(360deg);
   }
 }
+
+/* Removed login and signup specific styles. Only keep global styles and unrelated classes. */
