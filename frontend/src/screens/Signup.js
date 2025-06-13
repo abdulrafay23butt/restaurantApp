@@ -47,7 +47,19 @@ function Signup() {
       // You can redirect or show success message here
     } catch (error) {
       console.error('Error during signup:', error);
-      // Show error message to the user
+      if (error.message === 'Failed to fetch' || error.message === 'NetworkError when attempting to fetch resource.') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Server Not Responding',
+          text: 'The server is not responding. Please try again later.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Signup Failed',
+          text: error.message || 'An error occurred during signup.',
+        });
+      }
     }
     finally {
       setLoading(false);

@@ -41,11 +41,35 @@ function Login() {
         showConfirmButton: false,
       })
 
+      // Store token in localStorage for authentication
+      localStorage.setItem('token', data.token || 'dummy-token');
+
+      // Redirect based on role
+      if (role === 'Customer') {
+        navigate('/dashboard/customer');
+      } else if (role === 'Admin') {
+        navigate('/dashboard/admin');
+      } else if (role === 'Manager') {
+        navigate('/dashboard/manager');
+      }
+
       console.log('login successful:', data);
       // You can redirect or show success message here
     } catch (error) {
       console.error('Error during login:', error);
-      // Show error message to the user
+      if (error.message === 'Failed to fetch' || error.message === 'NetworkError when attempting to fetch resource.') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Server Not Responding',
+          text: 'The server is not responding. Please try again later.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: error.message || 'An error occurred during login.',
+        });
+      }
     }
     finally {
       setLoading(false);
