@@ -1,9 +1,15 @@
 import React from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext.js"
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth()
+  const logggedout = () => {
+    logout();
+    navigate('/login')
+  }
   const sidebarBtn = (label, path) => (
     <li>
       <button
@@ -28,7 +34,7 @@ function AdminDashboard() {
     </li>
   );
   return (
-    <div style={{ display: 'flex', minHeight: '100vh',}}>
+    <div style={{ display: 'flex', minHeight: '100vh', }}>
       <aside style={{ width: 240, background: '#f5f5f5', padding: 24, boxShadow: '2px 0 8px #eee', borderTopRightRadius: 16, borderBottomRightRadius: 16 }}>
         <h3 style={{ marginBottom: 32, color: '#1976d2', letterSpacing: 1 }}>Admin</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -51,7 +57,7 @@ function AdminDashboard() {
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
-              onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
+              onClick={logggedout}
             >
               Logout
             </button>

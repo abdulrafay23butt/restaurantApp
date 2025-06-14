@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 import Swal from 'sweetalert2';
 import { ClipLoader } from 'react-spinners';
+import { useAuth } from '../context/AuthContext.js';
 
 const roles = ['Customer', 'Manager', 'Admin'];
 
@@ -13,6 +14,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +44,7 @@ function Login() {
       })
 
       // Store token in localStorage for authentication
-      localStorage.setItem('token', data.token || 'dummy-token');
+      login(data.token);
 
       // Redirect based on role
       if (role === 'Customer') {
@@ -57,19 +59,14 @@ function Login() {
       // You can redirect or show success message here
     } catch (error) {
       console.error('Error during login:', error);
-      if (error.message === 'Failed to fetch' || error.message === 'NetworkError when attempting to fetch resource.') {
-        Swal.fire({
-          icon: 'error',
-          title: 'Server Not Responding',
-          text: 'The server is not responding. Please try again later.',
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: error.message || 'An error occurred during login.',
-        });
-      }
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: error.message,
+        showConfirmButton: false,
+        timer:2000
+      });
+
     }
     finally {
       setLoading(false);

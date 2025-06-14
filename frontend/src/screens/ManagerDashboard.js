@@ -1,9 +1,15 @@
 import React from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import {useAuth} from "../context/AuthContext.js"
 
 function ManagerDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth()
+  const logggedout = () => {
+    logout();
+    navigate('/login')
+  }
   const sidebarBtn = (label, path) => (
     <li>
       <button
@@ -50,7 +56,7 @@ function ManagerDashboard() {
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
-              onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
+              onClick={logggedout}
             >
               Logout
             </button>

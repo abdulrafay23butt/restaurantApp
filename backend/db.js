@@ -1,9 +1,13 @@
 // db.js
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const uri=process.env.MONGO_URI;
 
 const db = async () => {
   try {
-    await mongoose.connect("mongodb+srv://muhammadkhuzaimarahman:t9W6C9cma0W8OXLL@restaurantapp.kgwqazn.mongodb.net/?retryWrites=true&w=majority&appName=restaurantApp");
+    await mongoose.connect(uri);
     console.log('Connected to MongoDB Atlas');
   } catch (error) {
     console.error('MongoDB connection error:', error.message);

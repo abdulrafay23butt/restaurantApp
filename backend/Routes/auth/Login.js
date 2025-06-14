@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 // import db from "../database.js";
 const router = express.Router();
 
-
+const SECRET_KEY = process.env.JWT_SECRET;
 router.post("/", async (req, res) => {
     try {
         // Destructure and trim values
@@ -18,17 +18,29 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ error: "All fields are required and cannot be blank." });
         }
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email,role });
         if (!existingUser) {
-            return res.status(409).json({ message: 'User not found or invalid role' });
+            return res.status(409).json({ error: 'User not found or invalid role' });
         }
 
         const passwordMatch = await bcrypt.compare(pass, existingUser.password)
         if (!passwordMatch) {
-            return res.status(409).json({ message: 'Email and Password do not Match' });
+            return res.status(409).json({ error: 'Email and Password do not Match' });
         }
+
+        
+
+        const token = jwt.sign(
+            {
+                email: existingUser.email,
+                id: existingUser._id,
+                role: existingUser.role
+            },
+            SECRET_KEY,
+            { expiresIn: '24h' },
+        )
        
-        res.status(201).json({ message: "Login successful" });
+        res.status(201).json({ message: "Login successful",token });
     } catch (err) {
         // Handle duplicate email
         if (err.code === 11000) {

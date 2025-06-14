@@ -1,7 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import {useAuth} from "../context/AuthContext.js"
 
 function CustomerDashboard() {
+  const { logout } = useAuth()
+  const logggedout = () => {
+    logout();
+    navigate('/login')
+  }
   const navigate = useNavigate();
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
@@ -10,7 +16,7 @@ function CustomerDashboard() {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <li><button style={{ width: '100%', margin: '8px 0' }}>View Restaurants</button></li>
           <li><button style={{ width: '100%', margin: '8px 0' }}>My Bookings</button></li>
-          <li><button style={{ width: '100%', margin: '8px 0' }} onClick={() => navigate('/login')}>Logout</button></li>
+          <li><button style={{ width: '100%', margin: '8px 0' }} onClick={logggedout}>Logout</button></li>
         </ul>
       </aside>
       <main style={{ flex: 1, padding: 32 }}>

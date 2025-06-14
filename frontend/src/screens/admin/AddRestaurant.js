@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 
 const CUISINE_OPTIONS = [
@@ -8,13 +9,36 @@ const CUISINE_OPTIONS = [
 function AddRestaurant() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [manager, setManager] = useState('');
   const [cuisines, setCuisines] = useState([]);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [managersArray, setManagersArray] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchManagers = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/getManagers');
+        const data = await response.json();
+        setManagersArray(data);
+      } catch (error) {
+        console.error('Error fetching branches:', error);
+      }
+    };
+
+    fetchManagers();
+  }, []);
+
+  useEffect(() => {
+    setManager(managersArray[0]?.name)
+  }, [managersArray])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
+    console.log("imahe", file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -26,6 +50,7 @@ function AddRestaurant() {
     }
   };
 
+
   const handleCuisineChange = (e) => {
     const value = e.target.value;
     setCuisines(prev =>
@@ -35,62 +60,137 @@ function AddRestaurant() {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would send the data to the backend, including the image file and cuisines array
-    Swal.fire({
-      icon: 'success',
-      title: 'Restaurant Added',
-      text: 'The restaurant has been added successfully!',
-      timer: 2000,
-      showConfirmButton: false,
-    });
-    setName('');
-    setAddress('');
-    setCuisines([]);
-    setImage(null);
-    setImagePreview('');
+
+    if (cuisines.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: "Error",
+        text: "Please select at least one cuisine.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("address", address);
+      formData.append("manager", manager);
+      formData.append("image", image); // image is a File object
+
+      cuisines.forEach(cuisine => {
+        formData.append("cuisines[]", cuisine); // or just "cuisines" depending on backend handling
+      });
+
+      const response = await fetch("http://localhost:3001/api/addBranch", {
+        method: "POST",
+        body: formData // no headers needed; browser sets them for you
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'The restaurant has been added successfully!',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      setName('');
+      setAddress('');
+      setManager(managersArray[0]?.name);
+      setCuisines([]);
+      setImage(null);
+      setImagePreview('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
+    } catch (error) {
+      console.error("Error during add:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
+
   return (
-    <div style={{ maxWidth: 500, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32 }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Add Restaurant</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 18 }}>
-          <label style={{ fontWeight: 500 }}>Name:</label>
-          <input type="text" value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 }} />
+    <>
+      {loading && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent black
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <ClipLoader color="#ffffff" />
         </div>
-        <div style={{ marginBottom: 18 }}>
-          <label style={{ fontWeight: 500 }}>Address:</label>
-          <input type="text" value={address} onChange={e => setAddress(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 }} />
-        </div>
-        <div style={{ marginBottom: 18 }}>
-          <label style={{ fontWeight: 500, display: 'block', marginBottom: 6 }}>Cuisine(s):</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {CUISINE_OPTIONS.map(option => (
-              <label key={option} style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 400, background: cuisines.includes(option) ? '#e3f2fd' : '#f5f5f5', borderRadius: 4, padding: '4px 10px', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  value={option}
-                  checked={cuisines.includes(option)}
-                  onChange={handleCuisineChange}
-                  style={{ accentColor: '#1976d2' }}
-                />
-                {option}
-              </label>
-            ))}
+      )}
+      <div style={{ maxWidth: 500, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32 }}>
+        <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Add Restaurant</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontWeight: 500 }}>Branch Name:</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16, boxSizing: 'border-box' }} />
           </div>
-        </div>
-        <div style={{ marginBottom: 18 }}>
-          <label style={{ fontWeight: 500 }}>Image (optional):</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'block', marginTop: 6 }} />
-          {imagePreview && (
-            <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 180, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
-          )}
-        </div>
-        <button type="submit" style={{ width: '100%', padding: '12px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Add Restaurant</button>
-      </form>
-    </div>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontWeight: 500 }}>Address:</label>
+            <input type="text" value={address} onChange={e => setAddress(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16, boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontWeight: 500, display: 'block', marginBottom: 6 }}>Cuisine(s):</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {CUISINE_OPTIONS.map(option => (
+                <label key={option} style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 400, background: cuisines.includes(option) ? '#e3f2fd' : '#f5f5f5', borderRadius: 4, padding: '4px 10px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    value={option}
+                    checked={cuisines.includes(option)}
+                    onChange={handleCuisineChange}
+                    style={{ accentColor: '#1976d2' }}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontWeight: 500 }}>Manager</label>
+            <select value={manager} onChange={e => setManager(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16, boxSizing: 'border-box' }} >
+              {managersArray.map(r => (
+                <option key={r.name} value={r.name}>{r.name}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontWeight: 500 }}>Image (optional):</label>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'block', marginTop: 6 }} />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 180, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
+            )}
+          </div>
+          <button type="submit" style={{ width: '100%', padding: '12px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Add Restaurant</button>
+        </form>
+      </div>
+    </>
   );
 }
 
