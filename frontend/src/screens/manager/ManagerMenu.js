@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 const initialMenu = [
   { id: 1, name: 'Margherita Pizza', price: 12, category: 'Pizza', image: '' },
@@ -45,7 +46,20 @@ function ManagerMenu() {
   };
 
   const handleDelete = (id) => {
-    setMenu(menu.filter(item => item.id !== id));
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this menu item?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d32f2f',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setMenu(menu.filter(item => item.id !== id));
+        Swal.fire('Deleted!', 'The menu item has been deleted.', 'success');
+      }
+    });
   };
 
   const handleEditClick = (item) => {

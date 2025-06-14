@@ -46,39 +46,40 @@ function ManageRestaurants() {
   }, [])
 
   const handleDelete = async (id) => {
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:3001/api/deleteBranches", {
-        method: "DELETE",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id }),
-      });
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this restaurant?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d32f2f',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        const response = await fetch("http://localhost:3001/api/deleteBranches", {
+          method: "DELETE",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id }),
+        });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      fetchBranches();
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        fetchBranches();
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'The restaurant has been deleted successfully!',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    } catch (err) {
-      console.error("Error during add:", err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: err.message,
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    } finally {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'The restaurant has been deleted successfully!',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   const handleEdit = (branch) => {
@@ -255,7 +256,7 @@ function ManageRestaurants() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div style={{ maxWidth: 500, margin: '0 auto', background: '#fff', borderRadius: 12, padding: '0 32px' }}>
+        <div style={{ maxWidth: 500, maxHeight: 500, margin: '0 auto', background: '#fff', borderRadius: 12, padding: '0 32px' ,overflowY: 'auto'}}>
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Edit Restaurant</h2>
           <form onSubmit={editSubmit}>
             <div style={{ marginBottom: 18 }}>
@@ -296,11 +297,11 @@ function ManageRestaurants() {
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'block', marginTop: 6 }} />
               <div>
                 {imagePreview && (
-                  <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 180, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
+                  <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 100, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
                 )}
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', padding: '12px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Update Restaurant</button>
+            <button type="submit" style={{ width: '100%', padding: '5px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Update Restaurant</button>
           </form>
         </div>
       </Modal>

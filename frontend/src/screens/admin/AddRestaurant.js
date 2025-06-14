@@ -144,7 +144,7 @@ function AddRestaurant() {
           <ClipLoader color="#ffffff" />
         </div>
       )}
-      <div style={{ maxWidth: 500, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32 }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, overflowY: 'auto'}}>
         <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Add Restaurant</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 18 }}>
