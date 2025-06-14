@@ -22,6 +22,7 @@ function ManageUsers() {
         },
       });
       const data = await res.json();
+      console.log(data);
       setUsers(data);
     } catch (err) {
       alert('Failed to fetch users');
@@ -43,7 +44,7 @@ function ManageUsers() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editFields),
       });

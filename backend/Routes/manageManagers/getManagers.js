@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const users = await User.find({
-            role: { $in: ['worker', 'branch manager', 'head branch manager'] }
+            role: { $in: ['manager', 'head branch manager']}
         });
         res.status(200).json(users);
     } catch (error) {
