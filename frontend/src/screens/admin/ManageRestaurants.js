@@ -14,6 +14,7 @@ function ManageRestaurants() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [manager, setManager] = useState('');
+  const [managerId, setManagerId] = useState('');
   const [cuisines, setCuisines] = useState([]);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
@@ -44,6 +45,7 @@ function ManageRestaurants() {
     fetchBranches();
     fetchManagers();
   }, [])
+
 
   const handleDelete = async (id) => {
     Swal.fire({
@@ -86,11 +88,17 @@ function ManageRestaurants() {
     setIsModalOpen(true);
     setName(branch.name);
     setAddress(branch.address);
-    setManager(branch.manager)
+    setManager(branch.manager.name);
+    setManagerId(branch.manager._id);
     setImagePreview(`http://localhost:3001/uploads/${branch.image}`)
     setImage(branch.image)
     setCuisines(branch.cuisines || [])
     setEditingBranch(branch)
+
+    setManagersArray(prev => {
+      const exists = prev.some(m => m._id === branch.manager._id);
+      return exists ? prev : [...prev, branch.manager];
+    });
   };
 
   const editSubmit = async (e) => {
@@ -132,7 +140,7 @@ function ManageRestaurants() {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("address", address);
-      formData.append("manager", manager);
+      formData.append("manager", managerId);
       formData.append("image", image); // image is a File object
 
       cuisines.forEach(cuisine => {
@@ -236,15 +244,18 @@ function ManageRestaurants() {
           <tbody>
             {restaurants.map(r => (
               <tr key={r._id}>
-                <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center", width: "150px" }}><img
-                  src={`http://localhost:3001/uploads/${r.image}`}
-                  alt={r.name}
-                  style={{ width: '100px', height: 'auto', borderRadius: '8px' }}
-                /></td>
+                <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center", width: "150px" }}>
+                  <img
+                    src={r.image ? `http://localhost:3001/uploads/${r.image}` : '/No_Image_Available.jpg'}
+                    alt={r.name}
+                    style={{ width: '100px', height: 'auto', borderRadius: '8px' }}
+                  />
+                </td>
+
                 <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>{r.name}</td>
                 <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>{r.address}</td>
                 <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>{r.cuisines.join(', ')}</td>
-                <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>{r.manager}</td>
+                <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>{r.manager.name}</td>
                 <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center" }}>
                   <button onClick={() => handleEdit(r)} style={{ marginRight: 8, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 14px', cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => handleDelete(r._id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 14px', cursor: 'pointer' }}>Delete</button>
@@ -256,12 +267,12 @@ function ManageRestaurants() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div style={{ maxWidth: 500, maxHeight: 500, margin: '0 auto', background: '#fff', borderRadius: 12, padding: '0 32px' ,overflowY: 'auto'}}>
+        <div style={{ maxWidth: 500, maxHeight: 500, margin: '0 auto', background: '#fff', borderRadius: 12, padding: '0 32px', overflowY: 'auto' }}>
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Edit Restaurant</h2>
           <form onSubmit={editSubmit}>
             <div style={{ marginBottom: 18 }}>
               <label style={{ fontWeight: 500 }}>Branch Name:</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16,boxSizing: 'border-box' }} />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16, boxSizing: 'border-box' }} />
             </div>
             <div style={{ marginBottom: 18 }}>
               <label style={{ fontWeight: 500 }}>Address:</label>
@@ -286,22 +297,51 @@ function ManageRestaurants() {
             </div>
             <div style={{ marginBottom: 18 }}>
               <label style={{ fontWeight: 500 }}>Manager</label>
-              <select value={manager} onChange={e => setManager(e.target.value)} required style={{ width: '100%', padding: 10, marginTop: 6, borderRadius: 6, border: '1px solid #ccc', fontSize: 16, boxSizing: 'border-box' }} >
+              <select
+                value={managerId} // Use managerId for controlled value
+                onChange={e => {
+                  const selected = managersArray.find(m => m._id === e.target.value);
+                  if (selected) {
+                    setManager(selected.name);
+                    setManagerId(selected._id);
+                  }
+                }}
+                required
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  marginTop: 6,
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                  fontSize: 16,
+                  boxSizing: 'border-box'
+                }}
+              >
                 {managersArray.map(r => (
-                  <option key={r.name} value={r.name}>{r.name}</option>
+                  <option key={r._id} value={r._id}>
+                    {r.name}
+                  </option>
                 ))}
               </select>
+
             </div>
-            <div style={{ marginBottom: 18, display: "flex" }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={{ fontWeight: 500 }}>Image (optional):</label>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'block', marginTop: 6 }} />
               <div>
-                {imagePreview && (
-                  <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 100, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
+                {!imagePreview.includes(null) ? (
+                  <>
+                    <img src={imagePreview} alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 100, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
+                  </>
+                ) : (
+                  <>
+                  <p>{imagePreview}</p>
+                    <img src='/No_Image_Available.jpg' alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 100, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
+                  </>
                 )}
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', padding: '5px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Update Restaurant</button>
+            <button type="submit" style={{ width: '100%', padding: '15px 0', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 18, fontWeight: 600, cursor: 'pointer', marginTop: 10, boxShadow: '0 1px 4px #1976d233' }}>Update Restaurant</button>
           </form>
         </div>
       </Modal>

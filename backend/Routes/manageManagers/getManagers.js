@@ -1,20 +1,28 @@
 // routes/branchRoutes.js
 import express from 'express';
-import User from '../../Models/User.js'; // assuming this model represents branches
+import User from '../../Models/User.js';
+import Branch from '../../Models/Branch.js'
 
 const router = express.Router();
 
 // GET all managers and workers
 router.get('/', async (req, res) => {
     try {
-        const users = await User.find({
-            role: { $in: ['manager', 'head branch manager']}
+        const assignedManagerIds = await Branch.find().distinct('manager');
+        // console.log(assignedManagerIds)
+
+        const unassignedManagers = await User.find({
+            role: 'manager',
+            _id: { $nin: assignedManagerIds }
         });
-        res.status(200).json(users);
+        // console.log("unassignedManagers", unassignedManagers)
+
+        res.status(200).json(unassignedManagers);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching managers/workers', error });
+        res.status(500).json({ message: 'Error fetching unassigned managers', error });
     }
 });
+
 
 // PUT update user details and role
 router.put('/:id', async (req, res) => {

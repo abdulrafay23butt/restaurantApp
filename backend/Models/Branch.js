@@ -12,16 +12,20 @@ const branchSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    manager: {
-        type: String,
-        required: true,
-        trim: true
-    },
     cuisines: {
         type: [String],
         enum: ['italian', 'chinese', 'indian', 'mexican', 'american', 'thai', 'japanese', 'french', 'mediterranean'],
         default: ['italian'],
         lowercase: true
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    menu: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Menu',
     },
     image: {
         type: String

@@ -33,7 +33,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
         const id = req.params.id;
         const name = req.body.name?.trim();
         const address = req.body.address?.trim();
-        const manager = req.body.manager?.trim();
+        const manager = req.body.manager;
 
         let cuisines = req.body['cuisines'];
         if (!Array.isArray(cuisines)) {

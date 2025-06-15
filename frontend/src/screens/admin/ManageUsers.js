@@ -39,12 +39,10 @@ function ManageUsers() {
   const handleEditSave = async (id) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:3001/api/getManagers/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editFields),
       });
