@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
+import { useAuth } from '../../context/AuthContext';
 
-const initialMenu = [
-  { id: 1, name: 'Margherita Pizza', price: 12, category: 'Pizza', image: '' },
-  { id: 2, name: 'Spaghetti Carbonara', price: 15, category: 'Pasta', image: '' },
-  { id: 3, name: 'Caesar Salad', price: 9, category: 'Salad', image: '' },
-];
+const API_URL = 'http://localhost:3001/api/menu';
 
 function ManagerMenu() {
-  const [menu, setMenu] = useState(initialMenu);
+  const { managerId, branchId } = useAuth();
+  const [menu, setMenu] = useState([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
@@ -16,6 +14,14 @@ function ManagerMenu() {
   const [imagePreview, setImagePreview] = useState('');
   const [editId, setEditId] = useState(null);
   const [editFields, setEditFields] = useState({ name: '', price: '', category: '', image: '', imagePreview: '' });
+
+  useEffect(() => {
+    if (!managerId || !branchId) return;
+    fetch(`${API_URL}?manager=${managerId}&branch=${branchId}`)
+      .then(res => res.json())
+      .then(data => setMenu(data))
+      .catch(() => setMenu([]));
+  }, [managerId, branchId]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -31,21 +37,26 @@ function ManagerMenu() {
     }
   };
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!name || !price || !category) return;
-    setMenu([
-      ...menu,
-      { id: Date.now(), name, price: parseFloat(price), category, image: imagePreview },
-    ]);
-    setName('');
-    setPrice('');
-    setCategory('');
-    setImage(null);
-    setImagePreview('');
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('price', price);
+    formData.append('category', category);
+    formData.append('manager', managerId);
+    formData.append('branch', branchId);
+    
+    if (image) formData.append('image', image);
+    const res = await fetch(API_URL, { method: 'POST', body: formData });
+    if (res.ok) {
+      const { menu: newMenu } = await res.json();
+      setMenu([...menu, newMenu]);
+      setName(''); setPrice(''); setCategory(''); setImage(null); setImagePreview('');
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this menu item?',
@@ -54,22 +65,25 @@ function ManagerMenu() {
       confirmButtonColor: '#d32f2f',
       cancelButtonColor: '#aaa',
       confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setMenu(menu.filter(item => item.id !== id));
-        Swal.fire('Deleted!', 'The menu item has been deleted.', 'success');
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setMenu(menu.filter(item => item._id !== id));
+          Swal.fire('Deleted!', 'The menu item has been deleted.', 'success');
+        }
       }
     });
   };
 
   const handleEditClick = (item) => {
-    setEditId(item.id);
+    setEditId(item._id);
     setEditFields({
       name: item.name,
       price: item.price,
       category: item.category,
       image: '',
-      imagePreview: item.image,
+      imagePreview: item.image ? `/uploads/${item.image}` : '',
     });
   };
 
@@ -85,20 +99,21 @@ function ManagerMenu() {
     }
   };
 
-  const handleEditSave = (id) => {
-    setMenu(menu.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            name: editFields.name,
-            price: parseFloat(editFields.price),
-            category: editFields.category,
-            image: editFields.imagePreview,
-          }
-        : item
-    ));
-    setEditId(null);
-    setEditFields({ name: '', price: '', category: '', image: '', imagePreview: '' });
+  const handleEditSave = async (id) => {
+    const formData = new FormData();
+    formData.append('name', editFields.name);
+    formData.append('price', editFields.price);
+    formData.append('category', editFields.category);
+    formData.append('manager', managerId);
+    formData.append('branch', branchId);
+    if (editFields.image) formData.append('image', editFields.image);
+    const res = await fetch(`${API_URL}/${id}`, { method: 'PUT', body: formData });
+    if (res.ok) {
+      const { menu: updatedMenu } = await res.json();
+      setMenu(menu.map(item => item._id === id ? updatedMenu : item));
+      setEditId(null);
+      setEditFields({ name: '', price: '', category: '', image: '', imagePreview: '' });
+    }
   };
 
   return (
@@ -141,11 +156,11 @@ function ManagerMenu() {
             </thead>
             <tbody>
               {menu.map(item => (
-                <tr key={item.id} style={{ background: editId === item.id ? '#fafdff' : '#fff' }}>
+                <tr key={item._id} style={{ background: editId === item._id ? '#fafdff' : '#fff' }}>
                   <td style={{ padding: 12, border: '1px solid #e3f0ff', textAlign: 'center' }}>
                     {item.image && <img src={item.image} alt={item.name} style={{ maxWidth: 60, maxHeight: 48, borderRadius: 6, boxShadow: '0 1px 4px #b6c6e3' }} />}
                   </td>
-                  {editId === item.id ? (
+                  {editId === item._id ? (
                     <>
                       <td style={{ padding: 12, border: '1px solid #e3f0ff' }}>
                         <input type="text" value={editFields.name} onChange={e => setEditFields(f => ({ ...f, name: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b6c6e3' }} />
@@ -160,7 +175,7 @@ function ManagerMenu() {
                         <input type="file" accept="image/*" onChange={handleEditImageChange} />
                         {editFields.imagePreview && <img src={editFields.imagePreview} alt="Preview" style={{ marginTop: 6, maxWidth: 60, maxHeight: 48, borderRadius: 6, boxShadow: '0 1px 4px #b6c6e3' }} />}
                         <div style={{ marginTop: 8 }}>
-                          <button onClick={() => handleEditSave(item.id)} style={{ background: '#388e3c', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', marginRight: 8, fontWeight: 500 }}>Save</button>
+                          <button onClick={() => handleEditSave(item._id)} style={{ background: '#388e3c', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', marginRight: 8, fontWeight: 500 }}>Save</button>
                           <button onClick={() => setEditId(null)} style={{ background: '#aaa', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', fontWeight: 500 }}>Cancel</button>
                         </div>
                       </td>
@@ -172,7 +187,7 @@ function ManagerMenu() {
                       <td style={{ padding: 12, border: '1px solid #e3f0ff' }}>{item.category}</td>
                       <td style={{ padding: 12, border: '1px solid #e3f0ff' }}>
                         <button onClick={() => handleEditClick(item)} style={{ marginRight: 8, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', fontWeight: 500 }}>Edit</button>
-                        <button onClick={() => handleDelete(item.id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', fontWeight: 500 }}>Delete</button>
+                        <button onClick={() => handleDelete(item._id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', cursor: 'pointer', fontWeight: 500 }}>Delete</button>
                       </td>
                     </>
                   )}

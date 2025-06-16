@@ -14,6 +14,16 @@ const menuSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true
+    },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true

@@ -43,8 +43,13 @@ function Login() {
         showConfirmButton: false,
       })
 
-      // Store token in localStorage for authentication
-      login(data.token);
+      // Store token and IDs in localStorage for authentication
+      login(data.token, data.managerId, data.branchId);
+      // Also store in userData for context
+      if (data.managerId && data.branchId) {
+        localStorage.setItem('managerId', data.managerId);
+        localStorage.setItem('branchId', data.branchId);
+      }
 
       // Redirect based on role
       if (role === 'Customer') {

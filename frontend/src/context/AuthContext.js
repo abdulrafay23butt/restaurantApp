@@ -14,6 +14,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [managerId, setManagerId] = useState(localStorage.getItem('managerId') || null);
+  const [branchId, setBranchId] = useState(localStorage.getItem('branchId') || null);
   // const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,8 +51,16 @@ export const AuthProvider = ({ children }) => {
     fetchUserData();
   }, [isLoggedIn]);
 
-  const login = (token) => {
+  const login = (token, managerId, branchId) => {
     localStorage.setItem('token', token);
+    if (managerId) {
+      localStorage.setItem('managerId', managerId);
+      setManagerId(managerId);
+    }
+    if (branchId) {
+      localStorage.setItem('branchId', branchId);
+      setBranchId(branchId);
+    }
     setIsLoggedIn(true);
   };
 
@@ -59,6 +69,8 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.clear();
     setUserData(null);
     setIsLoggedIn(false);
+    setManagerId(null);
+    setBranchId(null);
   };
 
   const isAuthenticated = () => {
@@ -67,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userData, login, logout, isAuthenticated, setUserData }}
+      value={{ userData, login, logout, isAuthenticated, setUserData, managerId, branchId }}
     >
       {children}
     </AuthContext.Provider>

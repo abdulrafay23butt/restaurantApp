@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import express from "express"
 import User from "../../Models/User.js"
 import jwt from 'jsonwebtoken'
+import Branch from "../../Models/Branch.js"
 // import db from "../database.js";
 const router = express.Router();
 
@@ -28,8 +29,17 @@ router.post("/", async (req, res) => {
             return res.status(409).json({ error: 'Email and Password do not Match' });
         }
 
-        
-
+        let branchId = null;
+        let idField = {};
+        if (existingUser.role === 'manager' || existingUser.role === 'branch manager') {
+            const branch = await Branch.findOne({ manager: existingUser._id });
+            if (branch) branchId = branch._id;
+            idField = { managerId: existingUser._id };
+        } else if (existingUser.role === 'customer') {
+            idField = { customerId: existingUser._id };
+        } else if (existingUser.role === 'admin') {
+            idField = { adminId: existingUser._id };
+        }
         const token = jwt.sign(
             {
                 email: existingUser.email,
@@ -39,8 +49,7 @@ router.post("/", async (req, res) => {
             SECRET_KEY,
             { expiresIn: '24h' },
         )
-       
-        res.status(201).json({ message: "Login successful",token });
+        res.status(201).json({ message: "Login successful", token, branchId, ...idField });
     } catch (err) {
         // Handle duplicate email
         if (err.code === 11000) {

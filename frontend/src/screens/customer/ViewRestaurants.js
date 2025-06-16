@@ -32,7 +32,11 @@ function ViewRestaurants() {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
         {restaurants.map(r => (
           <div key={r._id || r.id} style={{ width: 280, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #e3f0ff', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {r.image && <img src={`http://localhost:3001/uploads/${r.image}`} alt={r.name} style={{ width: 220, height: 120, objectFit: 'contain', borderRadius: 8, marginBottom: 12 }} />}
+            <img
+              src={r.image ? `http://localhost:3001/uploads/${r.image}` : '../../../public/No_Image_Available.jpg'}
+              alt={r.name}
+              style={{ width: 220, height: 120, objectFit: 'contain', borderRadius: 8, marginBottom: 12 }}
+            />
             <h3 style={{ color: '#1976d2', marginBottom: 8 }}>{r.name}</h3>
             <p style={{ color: '#555', marginBottom: 4 }}>{r.address}</p>
             <p style={{ color: '#888', fontSize: 15 }}>{r.cuisines && r.cuisines.join(', ')}</p>
