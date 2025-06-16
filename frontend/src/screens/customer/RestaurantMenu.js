@@ -6,7 +6,7 @@ function RestaurantMenu() {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [cart, setCart] = useState([]); // [{item, qty}]
   const [showReserveModal, setShowReserveModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [reserveDetails, setReserveDetails] = useState({ date: '', time: '', seats: '', name: '', phone: '' });
@@ -28,18 +28,29 @@ function RestaurantMenu() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleSelect = (item) => {
-    setSelectedItems(prev =>
-      prev.some(i => i._id === item._id)
-        ? prev.filter(i => i._id !== item._id)
-        : [...prev, item]
-    );
+  const handleAddToCart = (item, qty) => {
+    setCart(prev => {
+      const existing = prev.find(ci => ci.item._id === item._id);
+      if (existing) {
+        return prev.map(ci => ci.item._id === item._id ? { ...ci, qty: ci.qty + qty } : ci);
+      } else {
+        return [...prev, { item, qty }];
+      }
+    });
+  };
+
+  const handleQtyChange = (item, qty) => {
+    setCart(prev => prev.map(ci => ci.item._id === item._id ? { ...ci, qty: qty } : ci));
+  };
+
+  const handleRemoveFromCart = (item) => {
+    setCart(prev => prev.filter(ci => ci.item._id !== item._id));
   };
 
   const handleReserve = (e) => {
     e.preventDefault();
     setReserveError('');
-    // Validate date and time
+    const now = new Date();
     const selectedDateTime = new Date(`${reserveDetails.date}T${reserveDetails.time}`);
     if (!reserveDetails.date || !reserveDetails.time) {
       setReserveError('Please select both date and time.');
@@ -61,14 +72,14 @@ function RestaurantMenu() {
   const handleConfirmOrder = () => {
     setShowCheckoutModal(false);
     setOrderConfirmed(true);
-    setSelectedItems([]);
+    setCart([]);
     setTimeout(() => setOrderConfirmed(false), 4000);
   };
 
-  const total = selectedItems.reduce((sum, item) => sum + (item.price || 0), 0);
+  const total = cart.reduce((sum, ci) => sum + (ci.item.price || 0) * ci.qty, 0);
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500, position: 'relative' }}>
+    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500, position: 'relative' }}>
       {/* Reserve Booking Button */}
       <button
         style={{ position: 'absolute', top: 32, right: 40, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 24px', cursor: 'pointer', zIndex: 2 }}
@@ -79,34 +90,54 @@ function RestaurantMenu() {
       <h2 style={{ color: '#1976d2', marginBottom: 24, textAlign: 'center' }}>Restaurant Menu</h2>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24,  }}>
         {menu.length === 0 && !loading && <p>No menu items found.</p>}
-        {menu.map(item => (
-          <div key={item._id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #eee', padding: '12px 0' }}>
-            <img
-              src={item.image ? `http://localhost:3001/uploads/${item.image}` : '/No_Image_Available.jpg'}
-              alt={item.name}
-              style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 6, marginRight: 18 }}
-            />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 500 }}>{item.name}</div>
-              <div style={{ color: '#888', fontSize: 15 }}>{item.category}</div>
+        {menu.map(item => {
+          const cartItem = cart.find(ci => ci.item._id === item._id);
+          return (
+            <div key={item._id} style={{ width: 240, background: '#fafdff', borderRadius: 12, boxShadow: '0 2px 8px #e3f0ff', padding: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+              <img
+                src={item.image ? `http://localhost:3001/uploads/${item.image}` : '/No_Image_Available.jpg'}
+                alt={item.name}
+                style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 80, marginBottom: 12, boxShadow: '0 1px 4px #b6c6e3' }}
+              />
+              <div style={{ fontWeight: 600, fontSize: 18, color: '#1976d2', marginBottom: 4 }}>{item.name}</div>
+              <div style={{ color: '#888', fontSize: 15, marginBottom: 4 }}>{item.category}</div>
+              <div style={{ fontWeight: 500, fontSize: 16, marginBottom: 10 }}>${item.price}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <input
+                  type="number"
+                  min={1}
+                  value={cartItem ? cartItem.qty : 1}
+                  onChange={e => handleQtyChange(item, Math.max(1, parseInt(e.target.value) || 1))}
+                  style={{ width: 48, padding: 4, borderRadius: 6, border: '1px solid #b6c6e3', textAlign: 'center' }}
+                  disabled={!cartItem}
+                />
+                {!cartItem ? (
+                  <button
+                    onClick={() => handleAddToCart(item, 1)}
+                    style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    Add to Cart
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleRemoveFromCart(item)}
+                    style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
-            <div style={{ width: 80, textAlign: 'right', fontWeight: 500 }}>${item.price}</div>
-            <input
-              type="checkbox"
-              checked={selectedItems.some(i => i._id === item._id)}
-              onChange={() => handleSelect(item)}
-              style={{ marginLeft: 18 }}
-            />
-          </div>
-        ))}
+          );
+        })}
       </div>
       {menu.length > 0 && (
         <button
           onClick={handleCheckout}
-          style={{ marginTop: 32, padding: '12px 32px', background: selectedItems.length ? '#1976d2' : '#aaa', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, cursor: selectedItems.length ? 'pointer' : 'not-allowed' }}
-          disabled={selectedItems.length === 0}
+          style={{ marginTop: 32, padding: '12px 32px', background: cart.length ? '#1976d2' : '#aaa', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, cursor: cart.length ? 'pointer' : 'not-allowed' }}
+          disabled={cart.length === 0}
         >
           Checkout
         </button>
@@ -165,10 +196,10 @@ function RestaurantMenu() {
             <button type="button" onClick={() => setShowCheckoutModal(false)} style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }}>&times;</button>
             <h3 style={{ color: '#1976d2', marginBottom: 18 }}>Order Summary</h3>
             <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
-              {selectedItems.map(item => (
-                <li key={item._id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span>{item.name}</span>
-                  <span>${item.price}</span>
+              {cart.map(ci => (
+                <li key={ci.item._id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span>{ci.item.name} x{ci.qty}</span>
+                  <span>${ci.item.price * ci.qty}</span>
                 </li>
               ))}
             </ul>
