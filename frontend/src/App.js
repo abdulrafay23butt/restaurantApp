@@ -12,6 +12,9 @@ import ManageRestaurants from './screens/admin/ManageRestaurants';
 import ManagerRevenue from './screens/manager/ManagerRevenue';
 import ManagerMenu from './screens/manager/ManagerMenu';
 import ManagerBookings from './screens/manager/ManagerBookings';
+import RestaurantMenu from './screens/customer/RestaurantMenu';
+import ViewRestaurants from './screens/customer/ViewRestaurants';
+import MyBookings from './screens/customer/MyBookings';
 import './App.css';
 import { useAuth } from './context/AuthContext';
 
@@ -26,9 +29,6 @@ function getUserRoleFromToken() {
     return null;
   }
 }
-
-
-
 
 function ProtectedRoute({ children, requiredRole }) {
   const { logout,isAuthenticated } = useAuth();
@@ -46,14 +46,17 @@ function ProtectedRoute({ children, requiredRole }) {
   return children;
 }
 
-
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard/customer" element={<ProtectedRoute requiredRole="customer"><CustomerDashboard /></ProtectedRoute>} />
+        <Route path="/dashboard/customer" element={<ProtectedRoute requiredRole="customer"><CustomerDashboard /></ProtectedRoute>}>
+          <Route index element={<ViewRestaurants />} />
+          <Route path="restaurant/:id" element={<RestaurantMenu />} />
+          <Route path="bookings" element={<MyBookings />} />
+        </Route>
         <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}>
           <Route path="approve" element={<ApproveUsers />} />
           <Route path="manage" element={<ManageUsers />} />

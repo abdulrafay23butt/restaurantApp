@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ViewRestaurants() {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRestaurants();
@@ -31,9 +33,13 @@ function ViewRestaurants() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
         {restaurants.map(r => (
-          <div key={r._id || r.id} style={{ width: 280, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #e3f0ff', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div
+            key={r._id || r.id}
+            style={{ width: 280, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #e3f0ff', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}
+            onClick={() => navigate(`/dashboard/customer/restaurant/${r._id}`)}
+          >
             <img
-              src={r.image ? `http://localhost:3001/uploads/${r.image}` : '../../../public/No_Image_Available.jpg'}
+              src={r.image ? `http://localhost:3001/uploads/${r.image}` : '/No_Image_Available.jpg'}
               alt={r.name}
               style={{ width: 220, height: 120, objectFit: 'contain', borderRadius: 8, marginBottom: 12 }}
             />
