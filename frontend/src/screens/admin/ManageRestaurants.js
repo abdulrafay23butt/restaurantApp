@@ -109,7 +109,7 @@ function ManageRestaurants() {
     const isSameCuisines = JSON.stringify(editingBranch.cuisines?.sort()) === JSON.stringify(cuisines.slice().sort());
     const isSameImage = typeof image === 'string' && image === editingBranch.image;
 
-    console.log(editingBranch.image)
+    // console.log(editingBranch.image)
 
     if (isSameName && isSameAddress && isSameManager && isSameCuisines && isSameImage) {
       Swal.fire({
@@ -335,7 +335,6 @@ function ManageRestaurants() {
                   </>
                 ) : (
                   <>
-                  <p>{imagePreview}</p>
                     <img src='/No_Image_Available.jpg' alt="Preview" style={{ marginTop: 12, maxWidth: '100%', maxHeight: 100, borderRadius: 8, boxShadow: '0 1px 6px #ccc' }} />
                   </>
                 )}

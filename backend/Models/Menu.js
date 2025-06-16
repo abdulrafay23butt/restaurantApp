@@ -2,29 +2,28 @@
 import mongoose from 'mongoose';
 
 const menuSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    category: {
-        type: String,
-        required: true
-    },
-    branch: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Branch',
-        required: true
-    },
-    manager: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    }
+    items: [
+        {
+            _id: {
+                type: mongoose.Schema.Types.ObjectId,
+                default: () => new mongoose.Types.ObjectId()
+            },
+            name: {
+                type: String,
+                trim: true
+            },
+            price: {
+                type: Number
+            },
+            category: {
+                type: String
+            },
+            image: {
+                type: String
+            }
+        }
+    ],
+
 }, {
     timestamps: true
 });

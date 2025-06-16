@@ -14,7 +14,7 @@ const branchSchema = new mongoose.Schema({
     },
     cuisines: {
         type: [String],
-        enum: ['italian', 'chinese', 'indian', 'mexican', 'american', 'thai', 'japanese', 'french', 'mediterranean'],
+        enum: ['italian', 'chinese', 'indian', 'mexican', 'american', 'thai', 'japanese', 'french', 'mediterranean','other'],
         default: ['italian'],
         lowercase: true
     },

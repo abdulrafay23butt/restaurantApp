@@ -29,47 +29,42 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // POST route
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/:id', upload.single('image'), async (req, res) => {
     try {
         const name = req.body.name?.trim();
-        const address = req.body.address?.trim();
-        const manager = req.body.manager?.trim();
+        const price = req.body.price;
+        const category = req.body.category?.trim();
+        const id = req.params.id
 
-        // cuisines[] might be sent as string or array
-        let cuisines = req.body['cuisines'];
-        if (!Array.isArray(cuisines)) {
-            cuisines = cuisines ? [cuisines] : [];
-        }
-        cuisines = cuisines.map(c => c.trim().toLowerCase());
 
         const image = req.file ? req.file.filename : null;
 
-        // console.log({ name, address, manager, cuisines, image });
+        // console.log({ name, price, manager, cuisines, image });
 
-        if (!name || !address || cuisines.length === 0 || !manager) {
+        if (!name || !price || !category) {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        const newMenu = new Menu({
-            items: []
-        });
+        await Menu.findByIdAndUpdate(
+            id,
+            {
+                $push: {
+                    items: {
+                        name,
+                        price,
+                        category,
+                        image
+                    }
+                }
+            },
+            { new: true }
+        );
 
-        const savedMenu = await newMenu.save();
+        await Branch.findOneAndUpdate()
 
-        const newBranch = new Branch({
-            name,
-            address,
-            manager,
-            menu:savedMenu._id,
-            cuisines,
-            image
-        });
-
-        await newBranch.save();
-
-        res.status(201).json({ message: 'Branch created successfully' });
+        res.status(201).json({ message: 'Menu created successfully' });
     } catch (err) {
-        console.error('Error saving branch:', err);
+        console.error('Error saving menu:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -35,7 +35,7 @@ const styles = {
     background: '#fff',
     padding: 20,
     borderRadius: 8,
-    minWidth: 300,
+    // minWidth: 300,
     position: 'relative'
   },
   closeButton: {

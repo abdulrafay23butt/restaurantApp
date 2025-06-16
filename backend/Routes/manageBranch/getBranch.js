@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const branches = await Branch.find().populate('manager'); 
-        console.log(branches);
+        // console.log(branches);
         res.status(200).json(branches);
     } catch (error) {
         console.error(error);

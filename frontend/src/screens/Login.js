@@ -60,7 +60,7 @@ function Login() {
         navigate('/dashboard/manager');
       }
 
-      console.log('login successful:', data);
+      // console.log('login .successful:', data);
       // You can redirect or show success message here
     } catch (error) {
       console.error('Error during login:', error);

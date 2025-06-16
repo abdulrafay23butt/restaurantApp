@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
         const data = await response.json();
 
-        console.log('Data from API:', response.data);
+        // console.log('Data from API:', response.data);
         setUserData(response.data);
       } catch (error) {
         console.error('API Error:', error);

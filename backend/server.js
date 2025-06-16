@@ -10,7 +10,10 @@ import getBranch from "./Routes/manageBranch/getBranch.js"
 import deleteBranch from "./Routes/manageBranch/deleteBranch.js"
 import editBranch from "./Routes/manageBranch/editBranch.js"
 import getManager from "./Routes/manageManagers/getManagers.js"
-import menuRoutes from "./Routes/manageManagers/menu.js"
+import getMenu from "./Routes/manageMenu/getItems.js"
+import addItem from "./Routes/manageMenu/addItem.js"
+import editItem from "./Routes/manageMenu/editItem.js"
+import deleteItem from "./Routes/manageMenu/deleteItem.js"
 
 
 
@@ -39,6 +42,11 @@ app.use("/api/editBranch",editBranch);
 
 //manageManager
 app.use("/api/getManagers",getManager);
-app.use("/api/menu", menuRoutes);
+
+//manageMenu
+app.use("/api/getMenu", getMenu);
+app.use("/api/addItem", addItem);
+app.use("/api/editItem", editItem);
+app.use("/api/deleteItem", deleteItem);
 
 app.use('/uploads', express.static('uploads'));
