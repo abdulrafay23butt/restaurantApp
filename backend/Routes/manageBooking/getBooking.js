@@ -5,21 +5,18 @@ const router = express.Router();
 
 router.get('/:id', async (req, res) => {
     try {
-        const branchId = req.params.id;
-        // console.log(branchId)
+        const userId = req.params.id;
 
-        const bookings = await Booking.find({user: id});
+        // Find bookings associated with this user ID
+        const bookings = await Booking.find({ user: userId });
 
-        if (!bookings) {
-            return res.status(404).json({ error: 'Bookings not found.' });
-        }
-        // console.log("branch.menu",branch.menu)
-
+        // Mongoose find() returns an empty array if no documents match, not null/undefined.
+        // So, we can directly send the bookings array.
         res.json(bookings);
     } catch (err) {
+        console.error('Error fetching bookings:', err);
         res.status(500).json({ error: err.message });
     }
 });
-
 
 export default router;
