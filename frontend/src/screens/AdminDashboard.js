@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext.js"
 
@@ -10,6 +10,13 @@ function AdminDashboard() {
     logout();
     navigate('/login')
   }
+  
+  // Auto-navigate to View Restaurants if on /dashboard/customer
+  useEffect(() => {
+    if (location.pathname === '/dashboard/admin') {
+      navigate('/dashboard/admin/manage', { replace: true });
+    }
+  }, [location.pathname, navigate]);
   const sidebarBtn = (label, path) => (
     <li>
       <button

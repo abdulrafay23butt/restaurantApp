@@ -16,15 +16,20 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [managerId, setManagerId] = useState(localStorage.getItem('managerId') || null);
   const [branchId, setBranchId] = useState(localStorage.getItem('branchId') || null);
+  const [loading, setLoading] = useState(true);
   // const navigate = useNavigate();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
 
     const fetchUserData = async () => {
-      if (!storedToken) return;
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
 
       try {
+        setLoading(true);
         const response = await fetch('http://localhost:3001/api/verifyToken', {
           method: 'POST',
           headers: {
@@ -45,6 +50,8 @@ export const AuthProvider = ({ children }) => {
             <Navigate to="/admin" replace />;
           }, 0);
         }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -79,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userData, login, logout, isAuthenticated, setUserData, managerId, branchId }}
+      value={{ userData, login, logout, isAuthenticated, setUserData, managerId, branchId, loading }}
     >
       {children}
     </AuthContext.Provider>

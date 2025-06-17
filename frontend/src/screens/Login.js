@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 import Swal from 'sweetalert2';
@@ -14,12 +14,26 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useAuth()
+  const { login, isAuthenticated, userData } = useAuth();
+
+  // Redirect after login based on role
+  useEffect(() => {
+    if (isAuthenticated() && userData && userData.role) {
+      if (userData.role === 'customer') {
+        navigate('/dashboard/customer');
+      } else if (userData.role === 'admin') {
+        navigate('/dashboard/admin');
+      } else if (userData.role === 'manager' || userData.role === 'branch manager') {
+        navigate('/dashboard/manager');
+      } else if (userData.role === 'head branch manager') {
+        navigate('/dashboard/head-branch-manager');
+      }
+    }
+  }, [isAuthenticated, userData, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
 
     try {
       const response = await fetch('http://localhost:3001/api/login', {
@@ -50,20 +64,7 @@ function Login() {
         localStorage.setItem('managerId', data.managerId);
         localStorage.setItem('branchId', data.branchId);
       }
-
-      // Redirect based on role
-      if (role === 'Customer') {
-        navigate('/dashboard/customer');
-      } else if (role === 'Admin') {
-        navigate('/dashboard/admin');
-      } else if (role === 'Manager') {
-        navigate('/dashboard/manager');
-      } else if (role === 'head branch manager') {
-        navigate('/dashboard/head-branch-manager');
-      }
-
-      // console.log('login .successful:', data);
-      // You can redirect or show success message here
+      // Navigation is now handled by useEffect
     } catch (error) {
       console.error('Error during login:', error);
       Swal.fire({

@@ -21,6 +21,7 @@ import MyBookings from './screens/customer/MyBookings';
 import './App.css';
 import { useAuth } from './context/AuthContext';
 import Checkout from './screens/customer/Checkout';
+import { ClipLoader } from 'react-spinners';
 
 function getUserRoleFromToken() {
   const token = localStorage.getItem("token");
@@ -35,7 +36,14 @@ function getUserRoleFromToken() {
 }
 
 function ProtectedRoute({ children, requiredRole }) {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, loading } = useAuth();
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <ClipLoader color="#1976d2" size={48} />
+      </div>
+    );
+  }
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
