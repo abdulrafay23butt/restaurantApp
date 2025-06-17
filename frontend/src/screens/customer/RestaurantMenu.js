@@ -32,6 +32,12 @@ function RestaurantMenu() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (showCheckoutModal && cart.length === 0) {
+      setShowCheckoutModal(false);
+    }
+  }, [cart, showCheckoutModal]);
+
   const handleAddToCart = (item, qty) => {
     setCart(prev => {
       const existing = prev.find(ci => ci.item._id === item._id);
@@ -264,9 +270,15 @@ function RestaurantMenu() {
               <h3 style={{ color: '#1976d2', marginBottom: 18 }}>Order Summary</h3>
               <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
                 {cart.map(ci => (
-                  <li key={ci.item._id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span>{ci.item.name} x{ci.qty}</span>
-                    <span>${ci.item.price * ci.qty}</span>
+                  <li key={ci.item._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span>{ci.item.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <button onClick={() => handleQtyChange(ci.item, Math.max(1, ci.qty - 1))} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>-</button>
+                      <input type="number" min={1} value={ci.qty} onChange={e => handleQtyChange(ci.item, Math.max(1, parseInt(e.target.value) || 1))} style={{ width: 36, textAlign: 'center', borderRadius: 4, border: '1px solid #b6c6e3' }} />
+                      <button onClick={() => handleQtyChange(ci.item, ci.qty + 1)} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>+</button>
+                      <span style={{ marginLeft: 10, fontWeight: 500 }}>${ci.item.price * ci.qty}</span>
+                      <button onClick={() => handleRemoveFromCart(ci.item)} style={{ marginLeft: 10, background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 10px', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -284,6 +296,7 @@ function RestaurantMenu() {
         {orderConfirmed && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 340, boxShadow: '0 2px 16px #1976d233', textAlign: 'center' }}>
+              <img src="/cheifimg.jpg" alt="Chef" style={{ width: 120, height: 120, borderRadius: '50%', marginBottom: 18, objectFit: 'cover', boxShadow: '0 2px 8px #e3f0ff' }} />
               <h3 style={{ color: '#388e3c', marginBottom: 18 }}>Order Confirmed!</h3>
               <p style={{ fontSize: 17, color: '#333', marginBottom: 12 }}>You can pick your order from the branch.</p>
               <button onClick={() => setOrderConfirmed(false)} style={{ marginTop: 10, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '8px 24px', cursor: 'pointer' }}>Close</button>
