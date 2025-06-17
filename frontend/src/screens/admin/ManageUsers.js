@@ -5,7 +5,7 @@ const ROLES = ['worker', 'branch manager', 'head branch manager'];
 function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [editId, setEditId] = useState(null);
-  const [editFields, setEditFields] = useState({ name: '', email: '', role: ROLES[0] });
+  const [editRole, setEditRole] = useState(ROLES[0]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -15,18 +15,17 @@ function ManageUsers() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/getManagers', {
+      const res = await fetch('http://localhost:3001/api/getManagers/ma', {
         headers: {
           'Content-Type': 'application/json',
         },
       });
       const data = await res.json();
-      // console.log(data);
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch users:', err);
       alert('Failed to fetch users. Check console for details.');
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -34,7 +33,7 @@ function ManageUsers() {
 
   const handleEditClick = (user) => {
     setEditId(user._id);
-    setEditFields({ name: user.name, email: user.email, role: user.role });
+    setEditRole(user.role);
   };
 
   const handleEditSave = async (id) => {
@@ -45,12 +44,12 @@ function ManageUsers() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editFields),
+        body: JSON.stringify({ role: editRole }),
       });
       if (!res.ok) throw new Error('Failed to update user');
       await fetchUsers();
       setEditId(null);
-      setEditFields({ name: '', email: '', role: ROLES[0] });
+      setEditRole(ROLES[0]);
     } catch (err) {
       console.error('Failed to update user:', err);
       alert('Failed to update user. Check console for details.');
@@ -77,14 +76,10 @@ function ManageUsers() {
             <tr key={user._id}>
               {editId === user._id ? (
                 <>
+                  <td style={{ padding: 10, border: '1px solid #eee' }}>{user.name}</td>
+                  <td style={{ padding: 10, border: '1px solid #eee' }}>{user.email}</td>
                   <td style={{ padding: 10, border: '1px solid #eee' }}>
-                    <input type="text" value={editFields.name} onChange={e => setEditFields(f => ({ ...f, name: e.target.value }))} style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} />
-                  </td>
-                  <td style={{ padding: 10, border: '1px solid #eee' }}>
-                    <input type="email" value={editFields.email} onChange={e => setEditFields(f => ({ ...f, email: e.target.value }))} style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} />
-                  </td>
-                  <td style={{ padding: 10, border: '1px solid #eee' }}>
-                    <select value={editFields.role} onChange={e => setEditFields(f => ({ ...f, role: e.target.value }))} style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }}>
+                    <select value={editRole} onChange={e => setEditRole(e.target.value)} style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }}>
                       {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </td>
