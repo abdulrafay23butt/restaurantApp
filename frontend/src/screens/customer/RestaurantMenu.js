@@ -26,7 +26,6 @@ function RestaurantMenu() {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [reserveDetails, setReserveDetails] = useState({ date: '', time: '', seats: '', name: '', phone: '' });
   const [reserveError, setReserveError] = useState('');
-  const [orderConfirmed, setOrderConfirmed] = useState(false);
   const { userData } = useAuth();
   const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
@@ -79,9 +78,6 @@ function RestaurantMenu() {
     notify();
   };
 
-  const handleQtyChange = (item, qty) => {
-    setCart(prev => prev.map(ci => ci.item._id === item._id ? { ...ci, qty: qty } : ci));
-  };
 
   const handleQuantityChange = (itemId, value) => {
     setQuantities(prev => ({
@@ -90,10 +86,6 @@ function RestaurantMenu() {
     }));
   };
 
-
-  const handleRemoveFromCart = (item) => {
-    setCart(prev => prev.filter(ci => ci.item._id !== item._id));
-  };
 
   const handleReserve = async (e) => {
     e.preventDefault();
@@ -116,7 +108,7 @@ function RestaurantMenu() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reserveDetails, id: userData.id }),
+        body: JSON.stringify({ reserveDetails, userId: userData.id, branchId: id }),
       });
 
       const data = await res.json();
@@ -151,18 +143,10 @@ function RestaurantMenu() {
 
   const handleCheckout = () => {
     localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("active", "Checkout")
 
     navigate("/dashboard/customer/checkout")
   };
-
-  const handleConfirmOrder = () => {
-    setShowCheckoutModal(false);
-    setOrderConfirmed(true);
-    setCart([]);
-    setTimeout(() => setOrderConfirmed(false), 4000);
-  };
-
-  const total = cart.reduce((sum, ci) => sum + (ci.item.price || 0) * ci.qty, 0);
 
   return (
     <>
@@ -292,43 +276,6 @@ function RestaurantMenu() {
           </div>
         )}
 
-        {/* Checkout Modal */}
-
-        <Modal isOpen={showCheckoutModal} onClose={() => setShowCheckoutModal(false)}>
-          <h3 style={{ color: '#1976d2', marginBottom: 18 }}>Order Summary</h3>
-          <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
-            {cart.map(ci => (
-              <li key={ci.item._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span>{ci.item.name}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <button onClick={() => handleQtyChange(ci.item, Math.max(1, ci.qty - 1))} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>-</button>
-                  <input type="number" min={1} value={ci.qty} onChange={e => handleQtyChange(ci.item, Math.max(1, parseInt(e.target.value) || 1))} style={{ width: 36, textAlign: 'center', borderRadius: 4, border: '1px solid #b6c6e3' }} />
-                  <button onClick={() => handleQtyChange(ci.item, ci.qty + 1)} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>+</button>
-                  <span style={{ marginLeft: 10, fontWeight: 500 }}>${ci.item.price * ci.qty}</span>
-                  <button onClick={() => handleRemoveFromCart(ci.item)} style={{ marginLeft: 10, background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 10px', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div style={{ borderTop: '1px solid #eee', margin: '16px 0' }}></div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: 18 }}>
-            <span>Total</span>
-            <span>${total}</span>
-          </div>
-          <button onClick={handleConfirmOrder} style={{ width: '100%', padding: '12px 0', background: '#388e3c', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, cursor: 'pointer', marginTop: 18 }}>Confirm Order</button>
-        </Modal>
-
-        {/* Success Message */}
-        {orderConfirmed && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 340, boxShadow: '0 2px 16px #1976d233', textAlign: 'center' }}>
-              <img src="/cheifimg.jpg" alt="Chef" style={{ width: 120, height: 120, borderRadius: '50%', marginBottom: 18, objectFit: 'cover', boxShadow: '0 2px 8px #e3f0ff' }} />
-              <h3 style={{ color: '#388e3c', marginBottom: 18 }}>Order Confirmed!</h3>
-              <p style={{ fontSize: 17, color: '#333', marginBottom: 12 }}>You can pick your order from the branch.</p>
-              <button onClick={() => setOrderConfirmed(false)} style={{ marginTop: 10, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '8px 24px', cursor: 'pointer' }}>Close</button>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

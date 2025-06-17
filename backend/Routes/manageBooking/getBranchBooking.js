@@ -5,10 +5,17 @@ const router = express.Router();
 
 router.get('/:id', async (req, res) => {
     try {
-        const userId = req.params.id;
+        const branchId = req.params.id;
 
-        const bookings = await Booking.find({ user: userId });
-        
+        // Get the current date without time (start of today)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const bookings = await Booking.find({
+            branch: branchId,
+            date: { $gte: today }  
+        }).sort({ date: -1 });
+
         res.status(200).json(bookings);
     } catch (err) {
         console.error('Error fetching bookings:', err);

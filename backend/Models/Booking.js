@@ -21,6 +21,11 @@ const bookingSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     date: {
         type: Date,
         required: true
@@ -33,7 +38,7 @@ const bookingSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'completed'],
+        enum: ['pending', 'approved', "refused", "expired", "completed"],
         default: 'pending'
     }
 }, {

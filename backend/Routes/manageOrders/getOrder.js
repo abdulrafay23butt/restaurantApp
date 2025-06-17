@@ -1,15 +1,15 @@
 import express from 'express';
-import Booking from '../../Models/Booking.js';
+import Purchase from '../../Models/Purchase.js';
 
 const router = express.Router();
 
 router.get('/:id', async (req, res) => {
     try {
-        const userId = req.params.id;
+        const branchId = req.params.id;
 
-        const bookings = await Booking.find({ user: userId });
+        const profit = await Purchase.find({ branchId: branchId });
         
-        res.status(200).json(bookings);
+        res.status(200).json(profit);
     } catch (err) {
         console.error('Error fetching bookings:', err);
         res.status(500).json({ error: err.message });

@@ -7,6 +7,11 @@ const purchaseSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     paid: {
         type: Number,
         required: true

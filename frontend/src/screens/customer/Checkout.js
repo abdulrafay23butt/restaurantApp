@@ -8,8 +8,6 @@ const Checkout = () => {
     const [loading, setLoading] = useState(false);
     const [cart, setCart] = useState(() => {
         const saved = localStorage.getItem("cart");
-        // console.log("saved", localStorage.getItem("cart"))
-
         try {
             return saved ? JSON.parse(saved) : [];
         } catch {
@@ -26,7 +24,6 @@ const Checkout = () => {
     }, [cart]);
 
     const handleQtyChange = (item, qty) => {
-        // console.log(item, qty)
         setCart(prev => prev.map(ci => ci.item._id === item ? { ...ci, qty: qty } : ci));
     };
 
@@ -37,15 +34,11 @@ const Checkout = () => {
 
 
     const handleConfirmOrder = async () => {
-        Swal.fire({
-            icon: "success",
-            title: "Order Placed",
-            text: "You can pick your order from the branch.",
-            timer: 2000,
-            showConfirmButton: false
-        })
 
         try {
+            if (cart.length === 0) {
+                throw new Error("Cart is Empty");
+            }
             setLoading(true);
             // console.log(userData)/
             const response = await fetch("http://localhost:3001/api/addOrder", {
@@ -58,8 +51,17 @@ const Checkout = () => {
 
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
+            Swal.fire({
+                icon: "success",
+                title: "Order Placed",
+                text: "You can pick your order from the branch.",
+                timer: 2000,
+                showConfirmButton: false
+            })
+
             setCart([]);
             localStorage.setItem("cart", JSON.stringify(cart));
+            localStorage.setItem("active", "View Restaurants")
             setTimeout(() => navigate("/dashboard/customer"), 2000)
 
         } catch (error) {

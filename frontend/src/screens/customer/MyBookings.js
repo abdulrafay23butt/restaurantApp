@@ -11,7 +11,7 @@ function MyBookings() {
   useEffect(() => {
     if (!userData?.id) return;
     setLoading(true);
-    fetch(`http://localhost:3001/api/getBooking/${userData.id}`)
+    fetch(`http://localhost:3001/api/getUserBooking/${userData.id}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

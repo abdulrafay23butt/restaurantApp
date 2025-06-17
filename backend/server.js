@@ -16,7 +16,17 @@ import editItem from "./Routes/manageMenu/editItem.js"
 import deleteItem from "./Routes/manageMenu/deleteItem.js"
 import addBooking from "./Routes/manageBooking/addBooking.js"
 import getBooking from "./Routes/manageBooking/getBooking.js"
+import UpdateBooking from "./Routes/manageBooking/updateBooking.js"
+import getBranchBooking from "./Routes/manageBooking/getBranchBooking.js"
 import addOrder from "./Routes/manageOrders/addOrder.js"
+import getOrder from "./Routes/manageOrders/getOrder.js"
+import agenda from './agendaJobs/agendaInstance.js';
+import './agendaJobs/changeBookingStatus.js'; // ensure job definitions are loaded
+
+(async function () {
+    await agenda.start();
+    console.log('Agenda started and ready');
+})();
 
 
 
@@ -27,24 +37,24 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const port = 3001;
 
 app.listen(port, () => {
-	console.log(`Server is listening from port ${port}.`);
+    console.log(`Server is listening from port ${port}.`);
     db();
 
 });
 
 //auth
-app.use("/api/login",login);
-app.use("/api/signup",signup);
-app.use("/api/verifyToken",verify)
+app.use("/api/login", login);
+app.use("/api/signup", signup);
+app.use("/api/verifyToken", verify)
 
 //manageBranch
-app.use("/api/addBranch",addBranch);
-app.use("/api/getBranches",getBranch);
-app.use("/api/deleteBranches",deleteBranch);
-app.use("/api/editBranch",editBranch);
+app.use("/api/addBranch", addBranch);
+app.use("/api/getBranches", getBranch);
+app.use("/api/deleteBranches", deleteBranch);
+app.use("/api/editBranch", editBranch);
 
 //manageManager
-app.use("/api/getManagers",getManager);
+app.use("/api/getManagers", getManager);
 
 //manageMenu
 app.use("/api/getMenu", getMenu);
@@ -54,10 +64,13 @@ app.use("/api/deleteItem", deleteItem);
 
 //manageBooking
 app.use("/api/addBooking", addBooking);
-app.use("/api/getBooking", getBooking);
+app.use("/api/getUserBooking", getBooking);
+app.use("/api/getBranchBooking", getBranchBooking);
+app.use("/api/updateBooking", UpdateBooking);
 
 //manageOrder
 app.use("/api/addOrder", addOrder);
+app.use("/api/getOrder", getOrder);
 
 
 app.use('/uploads', express.static('uploads'));
