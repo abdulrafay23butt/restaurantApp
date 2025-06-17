@@ -5,6 +5,9 @@ import Signup from './screens/Signup';
 import CustomerDashboard from './screens/CustomerDashboard';
 import AdminDashboard from './screens/AdminDashboard';
 import ManagerDashboard from './screens/ManagerDashboard';
+import HeadBranchManagerDashboard from './screens/headBranchManager/HeadBranchManagerDashboard';
+import HeadBranchRevenueOverview from './screens/headBranchManager/HeadBranchRevenueOverview';
+import HeadBranchMonthlyGraph from './screens/headBranchManager/HeadBranchMonthlyGraph';
 import ApproveUsers from './screens/admin/ApproveUsers';
 import ManageUsers from './screens/admin/ManageUsers';
 import AddRestaurant from './screens/admin/AddRestaurant';
@@ -70,8 +73,11 @@ function App() {
           <Route path="menu" element={<ManagerMenu />} />
           <Route path="bookings" element={<ManagerBookings />} />
         </Route>
-        
-
+        <Route path="/dashboard/head-branch-manager" element={<ProtectedRoute requiredRole="head branch manager"><HeadBranchManagerDashboard /></ProtectedRoute>}>
+          <Route index element={<HeadBranchRevenueOverview />} />
+          <Route path="revenue" element={<HeadBranchRevenueOverview />} />
+          <Route path="graph" element={<HeadBranchMonthlyGraph />} />
+        </Route>
       </Routes>
     </Router>
   );

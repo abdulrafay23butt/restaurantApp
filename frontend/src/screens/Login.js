@@ -58,6 +58,8 @@ function Login() {
         navigate('/dashboard/admin');
       } else if (role === 'Manager') {
         navigate('/dashboard/manager');
+      } else if (role === 'head branch manager') {
+        navigate('/dashboard/head-branch-manager');
       }
 
       // console.log('login .successful:', data);
