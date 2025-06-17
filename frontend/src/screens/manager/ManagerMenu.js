@@ -4,17 +4,15 @@ import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../../context/AuthContext';
 import Modal from '../../Modal';
 
-const API_URL = 'http://localhost:3001/api/menu';
 
 function ManagerMenu() {
-  const { managerId, branchId } = useAuth();
+  const {branchId } = useAuth();
   const [menu, setMenu] = useState([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
-  const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -282,7 +280,7 @@ function ManagerMenu() {
               </thead>
               <tbody>
                 {menu.items?.map(item => (
-                  <tr key={item._id} style={{ background: editId === item._id ? '#fafdff' : '#fff' }}>
+                  <tr key={item._id}>
                     <>
                       <td style={{ padding: 10, border: '1px solid #eee', textAlign: "center", width: "150px" }}>
                         <img
