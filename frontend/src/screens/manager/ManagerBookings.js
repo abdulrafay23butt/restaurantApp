@@ -108,7 +108,7 @@ function ManagerBookings() {
           <ClipLoader color="#ffffff" />
         </div>
       )}
-      <div style={{ maxWidth: 700, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500 }}>
+      <div style={{ width: 700, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500 }}>
         <h2 style={{ color: '#1976d2', marginBottom: 24, textAlign: 'center' }}>Restaurant Bookings</h2>
 
 
@@ -161,7 +161,7 @@ function ManagerBookings() {
                                     ? '#4CAF50' // Green
                                     : b.status === 'expired'
                                       ? '#9E9E9E' // Grey
-                                      : '#607D8B', 
+                                      : '#607D8B',
                         }}
                       >
                         {b.status.charAt(0).toUpperCase() + b.status.slice(1)}

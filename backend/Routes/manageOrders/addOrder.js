@@ -4,14 +4,14 @@ import Purchase from '../../Models/Purchase.js';
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-    const { id, total } = req.body;
-    console.log(id, total)
+    const { userId, total, branchId } = req.body;
+    console.log(userId, total)
     try {
-        if (!total || !id) {
+        if (!total || !userId || !branchId) {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        const newPurchase = new Purchase({ user: id, paid: total })
+        const newPurchase = new Purchase({ user: userId, branch: branchId, paid: total })
         await newPurchase.save();
 
         res.status(200).json({ message: "Purchased Successfully" })

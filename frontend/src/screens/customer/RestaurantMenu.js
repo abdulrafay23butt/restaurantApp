@@ -37,6 +37,7 @@ function RestaurantMenu() {
 
   useEffect(() => {
     if (!id) return;
+    localStorage.setItem("branchId", id)
     setLoading(true);
     fetch(`http://localhost:3001/api/getMenu/${id}`)
       .then(res => res.json())

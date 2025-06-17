@@ -15,8 +15,9 @@ const Checkout = () => {
             return [];
         }
     });
+    const branchId=localStorage.getItem("branchId")
     const navigate = useNavigate();
-    const { userData } = useAuth()
+    const { userData} = useAuth()
 
 
     useEffect(() => {
@@ -34,6 +35,7 @@ const Checkout = () => {
 
 
     const handleConfirmOrder = async () => {
+        console.log(cart);
 
         try {
             if (cart.length === 0) {
@@ -46,7 +48,7 @@ const Checkout = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: userData.id, total }),
+                body: JSON.stringify({ userId: userData.id, total, branchId: branchId }),
             });
 
             const data = await response.json();

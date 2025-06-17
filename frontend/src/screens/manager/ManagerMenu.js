@@ -6,7 +6,7 @@ import Modal from '../../Modal';
 
 
 function ManagerMenu() {
-  const {branchId } = useAuth();
+  const { branchId } = useAuth();
   const [menu, setMenu] = useState([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -242,31 +242,132 @@ function ManagerMenu() {
         </div>
       )}
       <div style={{ minHeight: '100vh', width: '100%', background: 'linear-gradient(120deg, #f8fafc 0%, #e3f0ff 100%)', padding: '40px 0' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px rgba(25, 118, 210, 0.08)', padding: 40, minHeight: 700 }}>
+        <div style={{ maxWidth: 700, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px rgba(25, 118, 210, 0.08)', padding: 40, minHeight: 700 }}>
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <h2 style={{ fontSize: 32, color: '#1976d2', marginBottom: 8, letterSpacing: 1 }}>Menu Management</h2>
             <p style={{ color: '#555', fontSize: 18 }}>Add, edit, or remove menu items for your branch. Upload images for a more appealing menu!</p>
           </div>
-          <form onSubmit={handleAdd} style={{ display: 'flex', gap: 20, marginBottom: 36, background: '#f5faff', padding: 24, borderRadius: 12, boxShadow: '0 1px 8px #e3f0ff', alignItems: 'flex-end' }}>
-            <div style={{ flex: 2, paddingRight: 10 }}>
-              <label style={{ fontWeight: 500 }}>Name</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #b6c6e3', marginTop: 4, background: '#fafdff' }} />
+          <form
+            onSubmit={handleAdd}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 20,
+              marginBottom: 36,
+              background: '#f5faff',
+              padding: 24,
+              borderRadius: 12,
+              boxShadow: '0 1px 8px #e3f0ff',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ flex: 2, paddingRight: 10, minWidth: 180 }}>
+              <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                placeholder="e.g. Coffee Mug"
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #b6c6e3',
+                  background: '#fafdff',
+                }}
+              />
             </div>
-            <div style={{ flex: 1, paddingRight: 10 }}>
-              <label style={{ fontWeight: 500 }}>Price ($)</label>
-              <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #b6c6e3', marginTop: 4, background: '#fafdff' }} />
+
+            <div style={{ flex: 1, paddingRight: 10, minWidth: 120 }}>
+              <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Price ($)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={price}
+                onChange={e => setPrice(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #b6c6e3',
+                  background: '#fafdff',
+                }}
+              />
             </div>
-            <div style={{ flex: 1, paddingRight: 10 }}>
-              <label style={{ fontWeight: 500 }}>Category</label>
-              <input type="text" value={category} onChange={e => setCategory(e.target.value)} required style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #b6c6e3', marginTop: 4, background: '#fafdff' }} />
+
+            <div style={{ flex: 1, paddingRight: 10, minWidth: 120 }}>
+              <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Category</label>
+              <input
+                type="text"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                required
+                placeholder="e.g. Kitchen"
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #b6c6e3',
+                  background: '#fafdff',
+                }}
+              />
             </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: 500, }}>Image</label>
-              <input type="file" accept="image/*" onChange={handleImageChange} style={{ width: '100%', marginTop: 4 }} />
-              {imagePreview && <img src={imagePreview} alt="Preview" style={{ marginTop: 6, maxWidth: 40, maxHeight: 40, borderRadius: 4, boxShadow: '0 1px 4px #b6c6e3' }} />}
+
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{
+                  width: '100%',
+                  padding: '8px 6px',
+                  borderRadius: 8,
+                  border: '1px solid #b6c6e3',
+                  background: '#fafdff',
+                  cursor: 'pointer',
+                }}
+              />
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  style={{
+                    marginTop: 6,
+                    maxWidth: 40,
+                    maxHeight: 40,
+                    borderRadius: 4,
+                    boxShadow: '0 1px 4px #b6c6e3',
+                    display: 'block',
+                  }}
+                />
+              )}
             </div>
-            <button type="submit" style={{ padding: '12px 28px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, cursor: 'pointer', height: 48, boxShadow: '0 1px 4px #1976d233' }}>Add</button>
+
+            <button
+              type="submit"
+              style={{
+                padding: '9px 22px',
+                background: '#1976d2',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: 18,
+                cursor: 'pointer',
+                height: 48,
+                boxShadow: '0 1px 4px #1976d233',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Add
+            </button>
           </form>
+
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: 12, boxShadow: '0 1px 8px #e3f0ff' }}>
               <thead>

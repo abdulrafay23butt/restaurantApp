@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import {useAuth} from "../context/AuthContext.js"
+import { useAuth } from "../context/AuthContext.js"
 
 function ManagerDashboard() {
   const navigate = useNavigate();
@@ -35,7 +35,20 @@ function ManagerDashboard() {
   );
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <aside style={{ width: 240, background: '#f5f5f5', padding: 24, boxShadow: '2px 0 8px #eee', borderTopRightRadius: 16, borderBottomRightRadius: 16 }}>
+      <aside
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          height: '100vh',
+          width: 240,
+          background: '#f5f5f5',
+          padding: 24,
+          boxShadow: '2px 0 8px #eee',
+          borderTopRightRadius: 16,
+          borderBottomRightRadius: 16,
+          zIndex: 1000,
+        }}>
         <h3 style={{ marginBottom: 32, color: '#1976d2', letterSpacing: 1 }}>Manager</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {sidebarBtn('Revenue', '/dashboard/manager/revenue')}
@@ -63,7 +76,7 @@ function ManagerDashboard() {
           </li>
         </ul>
       </aside>
-      <main style={{ flex: 1, padding: 32, background: '#f9f9fb', minHeight: '100vh' }}>
+      <main style={{ flex: 1, padding: 32, background: '#f9f9fb', minHeight: '100vh', marginLeft: 270 }}>
         <Outlet />
       </main>
     </div>
