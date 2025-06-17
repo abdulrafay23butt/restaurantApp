@@ -3,11 +3,14 @@ import { useAuth } from '../../context/AuthContext';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 
+const STATUS_OPTIONS = ['All', 'pending', 'approved', 'rejected', 'expired'];
+
 function ManagerBookings() {
   const { userData, branchId } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
 
   const fetchBranchBookings = async () => {
     if (!userData?.id) return;
@@ -34,15 +37,17 @@ function ManagerBookings() {
     }
   };
 
-  // Optional: auto-fetch on mount like useEffect originally did
   useEffect(() => {
     fetchBranchBookings();
   }, [userData]);
 
-
+  // Filter bookings by status
+  const filteredBookings = statusFilter === 'All'
+    ? bookings
+    : bookings.filter(b => b.status === statusFilter);
 
   // Group bookings by formatted date
-  const groupedBookings = bookings.reduce((acc, booking) => {
+  const groupedBookings = filteredBookings.reduce((acc, booking) => {
     const dateKey = new Date(booking.date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -88,7 +93,6 @@ function ManagerBookings() {
     } finally {
       setLoading(false);
     }
-
   }
 
   return (
@@ -111,11 +115,23 @@ function ManagerBookings() {
       <div style={{ width: 700, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500 }}>
         <h2 style={{ color: '#1976d2', marginBottom: 24, textAlign: 'center' }}>Restaurant Bookings</h2>
 
-
+        {/* Status Filter Dropdown */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+          <label style={{ fontWeight: 500, marginRight: 8 }}>Filter by Status:</label>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ccc', fontSize: 15 }}
+          >
+            {STATUS_OPTIONS.map(status => (
+              <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+            ))}
+          </select>
+        </div>
 
         {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
 
-        {bookings.length === 0 && !loading && (
+        {filteredBookings.length === 0 && !loading && (
           <p style={{ color: '#555', fontSize: 18, textAlign: 'center' }}>No bookings found.</p>
         )}
 
@@ -199,7 +215,7 @@ function ManagerBookings() {
                         onClick={(e) => handleBookingStatus(e, b._id, "rejected")}
                         disabled={b.status !== 'pending'}
                         style={{
-                          backgroundColor: b.status !== 'pending' ? '#ccc' : '#dc3545',
+                          backgroundColor: b.status !== 'pending' ? '#ccc' : '#F44336',
                           color: '#fff',
                           border: 'none',
                           padding: '6px 12px',

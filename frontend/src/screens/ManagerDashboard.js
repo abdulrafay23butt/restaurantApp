@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext.js"
 
@@ -10,6 +10,14 @@ function ManagerDashboard() {
     logout();
     navigate('/login')
   }
+
+  // Auto-navigate to Menu Management if on /dashboard/manager
+  useEffect(() => {
+    if (location.pathname === '/dashboard/manager') {
+      navigate('/dashboard/manager/menu', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
   const sidebarBtn = (label, path) => (
     <li>
       <button
@@ -51,7 +59,6 @@ function ManagerDashboard() {
         }}>
         <h3 style={{ marginBottom: 32, color: '#1976d2', letterSpacing: 1 }}>Manager</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {sidebarBtn('Revenue', '/dashboard/manager/revenue')}
           {sidebarBtn('Menu Management', '/dashboard/manager/menu')}
           {sidebarBtn('Bookings', '/dashboard/manager/bookings')}
           <li>

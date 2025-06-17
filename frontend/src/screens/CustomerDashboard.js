@@ -8,16 +8,20 @@ function CustomerDashboard() {
     return localStorage.getItem("active") || "View Restaurants";
   });
 
+  // Auto-navigate to View Restaurants if on /dashboard/customer
+  useEffect(() => {
+    if (location.pathname === '/dashboard/customer') {
+      navigate('/dashboard/customer', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
   // Keep active in sync with localStorage on route change
   useEffect(() => {
     const current = localStorage.getItem("active") || "View Restaurants";
     setActive(current);
   }, [location.pathname]);
 
-
-
   const sidebarBtn = (label, path) => (
-
     <li>
       <button
         style={{
