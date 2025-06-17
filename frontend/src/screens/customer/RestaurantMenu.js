@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../../context/AuthContext.js';
 import Swal from 'sweetalert2';
+import Modal from '../../Modal.js';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
 
 function RestaurantMenu() {
   const { id } = useParams(); // restaurant/branch id
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [cart, setCart] = useState([]); // [{item, qty}]
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem("cart");
+    console.log("saved", localStorage.getItem("cart"))
+
+    try {
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      localStorage.removeItem("cart");
+      return [];
+    }
+  }); // [{item, qty}]
   const [showReserveModal, setShowReserveModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [reserveDetails, setReserveDetails] = useState({ date: '', time: '', seats: '', name: '', phone: '' });
   const [reserveError, setReserveError] = useState('');
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const { userData } = useAuth();
+  const [quantities, setQuantities] = useState({});
+  const navigate = useNavigate();
 
   const todayStr = new Date().toISOString().split('T')[0];
   const now = new Date();
@@ -38,7 +52,22 @@ function RestaurantMenu() {
     }
   }, [cart, showCheckoutModal]);
 
+  const notify = () => {
+    toast.success('Added to cart', {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
+
   const handleAddToCart = (item, qty) => {
+    console.log(qty);
     setCart(prev => {
       const existing = prev.find(ci => ci.item._id === item._id);
       if (existing) {
@@ -47,11 +76,20 @@ function RestaurantMenu() {
         return [...prev, { item, qty }];
       }
     });
+    notify();
   };
 
   const handleQtyChange = (item, qty) => {
     setCart(prev => prev.map(ci => ci.item._id === item._id ? { ...ci, qty: qty } : ci));
   };
+
+  const handleQuantityChange = (itemId, value) => {
+    setQuantities(prev => ({
+      ...prev,
+      [itemId]: value
+    }));
+  };
+
 
   const handleRemoveFromCart = (item) => {
     setCart(prev => prev.filter(ci => ci.item._id !== item._id));
@@ -112,7 +150,9 @@ function RestaurantMenu() {
   };
 
   const handleCheckout = () => {
-    setShowCheckoutModal(true);
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    navigate("/dashboard/customer/checkout")
   };
 
   const handleConfirmOrder = () => {
@@ -142,6 +182,7 @@ function RestaurantMenu() {
         </div>
       )}
       <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px #e3f0ff', padding: 40, minHeight: 500, position: 'relative' }}>
+        <ToastContainer />
         {/* Reserve Booking Button */}
         <button
           style={{ position: 'absolute', top: 32, right: 40, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 24px', cursor: 'pointer', zIndex: 2 }}
@@ -155,7 +196,6 @@ function RestaurantMenu() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, }}>
           {menu.length === 0 && !loading && <p>No menu items found.</p>}
           {menu.map(item => {
-            const cartItem = cart.find(ci => ci.item._id === item._id);
             return (
               <div key={item._id} style={{ width: 240, background: '#fafdff', borderRadius: 12, boxShadow: '0 2px 8px #e3f0ff', padding: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
                 <img
@@ -170,26 +210,16 @@ function RestaurantMenu() {
                   <input
                     type="number"
                     min={1}
-                    value={cartItem ? cartItem.qty : 1}
-                    onChange={e => handleQtyChange(item, Math.max(1, parseInt(e.target.value) || 1))}
+                    value={quantities[item._id] || 1}
+                    onChange={e => handleQuantityChange(item._id, parseInt(e.target.value) || 1)}
                     style={{ width: 48, padding: 4, borderRadius: 6, border: '1px solid #b6c6e3', textAlign: 'center' }}
-                    disabled={!cartItem}
                   />
-                  {!cartItem ? (
-                    <button
-                      onClick={() => handleAddToCart(item, 1)}
-                      style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
-                    >
-                      Add to Cart
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleRemoveFromCart(item)}
-                      style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
-                    >
-                      Remove
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleAddToCart(item, quantities[item._id] || 1)}
+                    style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             );
@@ -201,7 +231,7 @@ function RestaurantMenu() {
             style={{ marginTop: 32, padding: '12px 32px', background: cart.length ? '#1976d2' : '#aaa', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, cursor: cart.length ? 'pointer' : 'not-allowed' }}
             disabled={cart.length === 0}
           >
-            Checkout
+            Go to Checkout
           </button>
         )}
 
@@ -263,34 +293,30 @@ function RestaurantMenu() {
         )}
 
         {/* Checkout Modal */}
-        {showCheckoutModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 340, boxShadow: '0 2px 16px #1976d233', position: 'relative' }}>
-              <button type="button" onClick={() => setShowCheckoutModal(false)} style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }}>&times;</button>
-              <h3 style={{ color: '#1976d2', marginBottom: 18 }}>Order Summary</h3>
-              <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
-                {cart.map(ci => (
-                  <li key={ci.item._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span>{ci.item.name}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <button onClick={() => handleQtyChange(ci.item, Math.max(1, ci.qty - 1))} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>-</button>
-                      <input type="number" min={1} value={ci.qty} onChange={e => handleQtyChange(ci.item, Math.max(1, parseInt(e.target.value) || 1))} style={{ width: 36, textAlign: 'center', borderRadius: 4, border: '1px solid #b6c6e3' }} />
-                      <button onClick={() => handleQtyChange(ci.item, ci.qty + 1)} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>+</button>
-                      <span style={{ marginLeft: 10, fontWeight: 500 }}>${ci.item.price * ci.qty}</span>
-                      <button onClick={() => handleRemoveFromCart(ci.item)} style={{ marginLeft: 10, background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 10px', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div style={{ borderTop: '1px solid #eee', margin: '16px 0' }}></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: 18 }}>
-                <span>Total</span>
-                <span>${total}</span>
-              </div>
-              <button onClick={handleConfirmOrder} style={{ width: '100%', padding: '12px 0', background: '#388e3c', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, cursor: 'pointer', marginTop: 18 }}>Confirm Order</button>
-            </div>
+
+        <Modal isOpen={showCheckoutModal} onClose={() => setShowCheckoutModal(false)}>
+          <h3 style={{ color: '#1976d2', marginBottom: 18 }}>Order Summary</h3>
+          <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+            {cart.map(ci => (
+              <li key={ci.item._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span>{ci.item.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button onClick={() => handleQtyChange(ci.item, Math.max(1, ci.qty - 1))} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>-</button>
+                  <input type="number" min={1} value={ci.qty} onChange={e => handleQtyChange(ci.item, Math.max(1, parseInt(e.target.value) || 1))} style={{ width: 36, textAlign: 'center', borderRadius: 4, border: '1px solid #b6c6e3' }} />
+                  <button onClick={() => handleQtyChange(ci.item, ci.qty + 1)} style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #b6c6e3', background: '#f5f5f5', fontWeight: 600, cursor: 'pointer' }}>+</button>
+                  <span style={{ marginLeft: 10, fontWeight: 500 }}>${ci.item.price * ci.qty}</span>
+                  <button onClick={() => handleRemoveFromCart(ci.item)} style={{ marginLeft: 10, background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 10px', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div style={{ borderTop: '1px solid #eee', margin: '16px 0' }}></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: 18 }}>
+            <span>Total</span>
+            <span>${total}</span>
           </div>
-        )}
+          <button onClick={handleConfirmOrder} style={{ width: '100%', padding: '12px 0', background: '#388e3c', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, cursor: 'pointer', marginTop: 18 }}>Confirm Order</button>
+        </Modal>
 
         {/* Success Message */}
         {orderConfirmed && (

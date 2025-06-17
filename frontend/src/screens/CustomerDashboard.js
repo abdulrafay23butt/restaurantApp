@@ -36,6 +36,7 @@ function CustomerDashboard() {
           <ul style={{ listStyle: 'none', padding: 0, width: '100%' }}>
             {sidebarBtn('View Restaurants', '')}
             {sidebarBtn('My Bookings', 'bookings')}
+            {sidebarBtn('Checkout', 'checkout')}
             <li>
               <button style={{ width: '100%', margin: '8px 0', background: '#fff', color: '#d32f2f', border: '1px solid #ffd180', borderRadius: 6, fontWeight: 500, fontSize: 16, padding: '10px 0', cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => { localStorage.removeItem('token'); window.location.href = '/login'; }}>Logout</button>
             </li>

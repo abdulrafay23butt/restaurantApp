@@ -17,6 +17,7 @@ import ViewRestaurants from './screens/customer/ViewRestaurants';
 import MyBookings from './screens/customer/MyBookings';
 import './App.css';
 import { useAuth } from './context/AuthContext';
+import Checkout from './screens/customer/Checkout';
 
 function getUserRoleFromToken() {
   const token = localStorage.getItem("token");
@@ -31,7 +32,7 @@ function getUserRoleFromToken() {
 }
 
 function ProtectedRoute({ children, requiredRole }) {
-  const { logout,isAuthenticated } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
@@ -56,6 +57,7 @@ function App() {
           <Route index element={<ViewRestaurants />} />
           <Route path="restaurant/:id" element={<RestaurantMenu />} />
           <Route path="bookings" element={<MyBookings />} />
+          <Route path="checkout" element={<Checkout />} />
         </Route>
         <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}>
           <Route path="approve" element={<ApproveUsers />} />
@@ -68,6 +70,8 @@ function App() {
           <Route path="menu" element={<ManagerMenu />} />
           <Route path="bookings" element={<ManagerBookings />} />
         </Route>
+        
+
       </Routes>
     </Router>
   );

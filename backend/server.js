@@ -16,6 +16,7 @@ import editItem from "./Routes/manageMenu/editItem.js"
 import deleteItem from "./Routes/manageMenu/deleteItem.js"
 import addBooking from "./Routes/manageBooking/addBooking.js"
 import getBooking from "./Routes/manageBooking/getBooking.js"
+import addOrder from "./Routes/manageOrders/addOrder.js"
 
 
 
@@ -54,6 +55,9 @@ app.use("/api/deleteItem", deleteItem);
 //manageBooking
 app.use("/api/addBooking", addBooking);
 app.use("/api/getBooking", getBooking);
+
+//manageOrder
+app.use("/api/addOrder", addOrder);
 
 
 app.use('/uploads', express.static('uploads'));
