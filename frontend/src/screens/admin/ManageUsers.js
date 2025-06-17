@@ -25,7 +25,8 @@ function ManageUsers() {
       // console.log(data);
       setUsers(data);
     } catch (err) {
-      alert('Failed to fetch users');
+      console.error('Failed to fetch users:', err);
+      alert('Failed to fetch users. Check console for details.');
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,8 @@ function ManageUsers() {
       setEditId(null);
       setEditFields({ name: '', email: '', role: ROLES[0] });
     } catch (err) {
-      alert('Failed to update user');
+      console.error('Failed to update user:', err);
+      alert('Failed to update user. Check console for details.');
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../context/AuthContext.js';
 
-const roles = ['Customer', 'Manager', 'Admin'];
+const roles = ['Customer', 'Manager', 'Admin', 'head branch manager'];
 
 function Login() {
   const [email, setEmail] = useState('');
