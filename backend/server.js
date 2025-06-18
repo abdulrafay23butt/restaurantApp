@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from "cors";
 import bodyParser from "body-parser";
+import path from 'path';
+import { fileURLToPath } from 'url';
 import db from "./db.js"
 import login from "./Routes/auth/Login.js"
 import signup from "./Routes/auth/Signup.js"
@@ -76,3 +78,15 @@ app.use("/api/updateOrder", updateOrder);
 
 
 app.use('/uploads', express.static('uploads'));
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from React
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// For any route not handled above, serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+});
