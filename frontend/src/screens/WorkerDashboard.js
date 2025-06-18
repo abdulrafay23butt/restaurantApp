@@ -8,7 +8,7 @@ function WorkerDashboard() {
   const { logout } = useAuth()
   const logggedout = () => {
     logout();
-    navigate('/login')
+    navigate('/')
   }
   const sidebarBtn = (label, path) => (
     <li>

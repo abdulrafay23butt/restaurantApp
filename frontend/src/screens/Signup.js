@@ -43,7 +43,7 @@ function Signup() {
         showConfirmButton: false,
 
       })
-      navigate("/login")
+      navigate("/")
       // You can redirect or show success message here
     } catch (error) {
       console.error('Error during signup:', error);
@@ -112,7 +112,7 @@ function Signup() {
             </div>
             <button type="submit">Signup</button>
           </form>
-          <button className={styles.switchBtn} onClick={() => navigate('/login')}>
+          <button className={styles.switchBtn} onClick={() => navigate('/')}>
             Already have an account? Login
           </button>
         </div>

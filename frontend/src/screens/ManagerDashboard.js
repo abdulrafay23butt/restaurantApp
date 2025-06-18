@@ -8,7 +8,7 @@ function ManagerDashboard() {
   const { logout } = useAuth()
   const logggedout = () => {
     logout();
-    navigate('/login')
+    navigate('/')
   }
 
   // Auto-navigate to Menu Management if on /dashboard/manager

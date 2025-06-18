@@ -9,7 +9,7 @@ function HeadBranchManagerDashboard() {
 
   // Basic role check for the dashboard layout itself
   if (!userData || userData.role !== 'head branch manager') {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (

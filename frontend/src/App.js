@@ -39,14 +39,14 @@ function getUserRoleFromToken() {
 function ProtectedRoute({ children, requiredRole }) {
   const { logout, isAuthenticated } = useAuth();
   if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const role = getUserRoleFromToken();
 
   if (role !== requiredRole) {
     logout();
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -56,7 +56,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard/customer" element={<ProtectedRoute requiredRole="customer"><CustomerDashboard /></ProtectedRoute>}>
           <Route index element={<ViewRestaurants />} />
