@@ -268,7 +268,7 @@ function ManagerMenu() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
-                placeholder="e.g. Coffee Mug"
+                placeholder="e.g. Pizza"
                 style={{
                   width: '100%',
                   padding: 10,
@@ -283,7 +283,7 @@ function ManagerMenu() {
               <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Price ($)</label>
               <input
                 type="number"
-                min="0"
+                min="1"
                 step="0.01"
                 inputMode="decimal"
                 value={price}
