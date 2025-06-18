@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from "../context/AuthContext.js"
+import {useAuth} from "../context/AuthContext.js"
 
-function AdminDashboard() {
+function WorkerDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth()
@@ -10,13 +10,6 @@ function AdminDashboard() {
     logout();
     navigate('/login')
   }
-  
-  // Auto-navigate to View Restaurants if on /dashboard/customer
-  useEffect(() => {
-    if (location.pathname === '/dashboard/admin') {
-      navigate('/dashboard/admin/manage', { replace: true });
-    }
-  }, [location.pathname, navigate]);
   const sidebarBtn = (label, path) => (
     <li>
       <button
@@ -41,26 +34,11 @@ function AdminDashboard() {
     </li>
   );
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', }}>
-      <aside style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        height: '100vh',
-        width: 240,
-        background: '#f5f5f5',
-        padding: 24,
-        boxShadow: '2px 0 8px #eee',
-        borderTopRightRadius: 16,
-        borderBottomRightRadius: 16,
-        zIndex: 1000,
-      }}>
-        <h3 style={{ marginBottom: 32, color: '#1976d2', letterSpacing: 1 }}>Admin</h3>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <aside style={{ width: 240, background: '#f5f5f5', padding: 24, boxShadow: '2px 0 8px #eee', borderTopRightRadius: 16, borderBottomRightRadius: 16 }}>
+        <h3 style={{ marginBottom: 32, color: '#1976d2', letterSpacing: 1 }}>Manager</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {sidebarBtn('Approve Users', '/dashboard/admin/approve')}
-          {sidebarBtn('Manage Users', '/dashboard/admin/manage')}
-          {sidebarBtn('Add Restaurant', '/dashboard/admin/add-restaurant')}
-          {sidebarBtn('Manage Restaurants', '/dashboard/admin/manage-restaurants')}
+          {sidebarBtn('See Order', '')}
           <li>
             <button
               style={{
@@ -83,11 +61,11 @@ function AdminDashboard() {
           </li>
         </ul>
       </aside>
-      <main style={{ flex: 1, padding: 32, background: '#f9f9fb', minHeight: '100vh', marginLeft: 270 }}>
+      <main style={{ flex: 1, padding: 32, background: '#f9f9fb', minHeight: '100vh' }}>
         <Outlet />
       </main>
     </div>
   );
 }
 
-export default AdminDashboard; 
+export default WorkerDashboard; 

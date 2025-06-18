@@ -228,8 +228,8 @@ function ManageRestaurants() {
           <ClipLoader color="#ffffff" />
         </div>
       )}
-      <div>
-        <h2>Manage Restaurants</h2>
+      <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 32px rgba(25, 118, 210, 0.08)', padding: 40, minHeight: 500 }}>
+        <h2  style={{ textAlign: 'center', marginBottom: 24 }}>Manage Restaurants</h2>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
           <thead>
             <tr style={{ background: '#f5f5f5' }}>

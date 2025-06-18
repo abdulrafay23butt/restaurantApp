@@ -5,6 +5,8 @@ import Signup from './screens/Signup';
 import CustomerDashboard from './screens/CustomerDashboard';
 import AdminDashboard from './screens/AdminDashboard';
 import ManagerDashboard from './screens/ManagerDashboard';
+import WorkerDashboard from "./screens/WorkerDashboard";
+import WorkerOrder from './screens/worker/WorkerOrder';
 import HeadBranchManagerDashboard from './screens/headBranchManager/HeadBranchManagerDashboard';
 import HeadBranchRevenueOverview from './screens/headBranchManager/HeadBranchRevenueOverview';
 import HeadBranchMonthlyGraph from './screens/headBranchManager/HeadBranchMonthlyGraph';
@@ -21,7 +23,6 @@ import MyBookings from './screens/customer/MyBookings';
 import './App.css';
 import { useAuth } from './context/AuthContext';
 import Checkout from './screens/customer/Checkout';
-import { ClipLoader } from 'react-spinners';
 
 function getUserRoleFromToken() {
   const token = localStorage.getItem("token");
@@ -36,14 +37,7 @@ function getUserRoleFromToken() {
 }
 
 function ProtectedRoute({ children, requiredRole }) {
-  const { logout, isAuthenticated, loading } = useAuth();
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <ClipLoader color="#1976d2" size={48} />
-      </div>
-    );
-  }
+  const { logout, isAuthenticated } = useAuth();
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
@@ -86,6 +80,9 @@ function App() {
           <Route path="revenue" element={<HeadBranchRevenueOverview />} />
           <Route path="graph" element={<HeadBranchMonthlyGraph />} />
         </Route>
+         <Route path="/dashboard/worker" element={<ProtectedRoute requiredRole="worker"><WorkerDashboard/></ProtectedRoute>}> 
+          <Route index element={<WorkerOrder />} />
+        </Route> 
       </Routes>
     </Router>
   );

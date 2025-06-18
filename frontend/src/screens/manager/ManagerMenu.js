@@ -319,34 +319,36 @@ function ManagerMenu() {
 
             <div style={{ flex: 1, minWidth: 160 }}>
               <label style={{ fontWeight: 500, display: 'block', marginBottom: 4 }}>Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 6px',
-                  borderRadius: 8,
-                  border: '1px solid #b6c6e3',
-                  background: '#fafdff',
-                  cursor: 'pointer',
-                }}
-              />
-              {imagePreview && (
-                <img
-                  src={imagePreview}
-                  alt="Preview"
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
                   style={{
-                    marginTop: 6,
-                    maxWidth: 40,
-                    maxHeight: 40,
-                    borderRadius: 4,
-                    boxShadow: '0 1px 4px #b6c6e3',
-                    display: 'block',
+                    flex: 1,
+                    padding: '8px 6px',
+                    borderRadius: 8,
+                    border: '1px solid #b6c6e3',
+                    background: '#fafdff',
+                    cursor: 'pointer',
                   }}
                 />
-              )}
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{
+                      maxWidth: 80,
+                      maxHeight: 80,
+                      borderRadius: 6,
+                      boxShadow: '0 2px 6px #b6c6e3',
+                    }}
+                  />
+                )}
+              </div>
             </div>
+
+
 
             <button
               type="submit"

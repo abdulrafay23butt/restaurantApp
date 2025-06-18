@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from 'mongoose';
 
 const purchaseSchema = new mongoose.Schema({
@@ -12,14 +11,24 @@ const purchaseSchema = new mongoose.Schema({
         ref: 'Branch',
         required: true
     },
+    Order: [
+        {
+            name: String,
+            qty: Number
+        }
+    ],
     paid: {
         type: Number,
         required: true
     },
+    status: {
+        type: String,
+        enum: ['pending', 'completed'],
+        default: 'pending'
+    }
 }, {
     timestamps: true
 });
 
-const purchase = mongoose.model('Purchase', purchaseSchema);
-
-export default purchase;
+const Purchase = mongoose.model('Purchase', purchaseSchema);
+export default Purchase;

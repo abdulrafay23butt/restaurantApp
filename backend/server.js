@@ -20,6 +20,7 @@ import UpdateBooking from "./Routes/manageBooking/updateBooking.js"
 import getBranchBooking from "./Routes/manageBooking/getBranchBooking.js"
 import addOrder from "./Routes/manageOrders/addOrder.js"
 import getOrder from "./Routes/manageOrders/getOrder.js"
+import updateOrder from "./Routes/manageOrders/UpdateOrder.js"
 import agenda from './agendaJobs/agendaInstance.js';
 import './agendaJobs/changeBookingStatus.js'; // ensure job definitions are loaded
 
@@ -71,6 +72,7 @@ app.use("/api/updateBooking", UpdateBooking);
 //manageOrder
 app.use("/api/addOrder", addOrder);
 app.use("/api/getOrder", getOrder);
+app.use("/api/updateOrder", updateOrder);
 
 
 app.use('/uploads', express.static('uploads'));

@@ -15,13 +15,14 @@ const Checkout = () => {
             return [];
         }
     });
-    const branchId=localStorage.getItem("branchId")
+    const branchId = localStorage.getItem("branchId")
     const navigate = useNavigate();
-    const { userData} = useAuth()
+    const { userData } = useAuth()
 
 
     useEffect(() => {
         localStorage.setItem("cart", JSON.stringify(cart));
+        console.log(cart)
     }, [cart]);
 
     const handleQtyChange = (item, qty) => {
@@ -48,7 +49,7 @@ const Checkout = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId: userData.id, total, branchId: branchId }),
+                body: JSON.stringify({ userId: userData.id, total, branchId: branchId, cart }),
             });
 
             const data = await response.json();

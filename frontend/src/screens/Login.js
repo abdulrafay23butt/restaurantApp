@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../context/AuthContext.js';
 
-const roles = ['Customer', 'Manager', 'Admin', 'head branch manager'];
+const roles = ['Customer', 'Manager', 'Admin', 'head branch manager', 'worker'];
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -27,6 +27,8 @@ function Login() {
         navigate('/dashboard/manager');
       } else if (userData.role === 'head branch manager') {
         navigate('/dashboard/head-branch-manager');
+      } else if (userData.role === 'worker') {
+        navigate('/dashboard/worker');
       }
     }
   }, [isAuthenticated, userData, navigate]);
@@ -72,7 +74,7 @@ function Login() {
         title: 'Login Failed',
         text: error.message,
         showConfirmButton: false,
-        timer:2000
+        timer: 2000
       });
 
     }

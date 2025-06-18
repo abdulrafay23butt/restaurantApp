@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
         const assignedManagerIds = await Branch.find().distinct('manager');
         
         const unassignedManagers = await User.find({
-            role: { $in: ['Manager', 'worker', 'head branch manager'] }, // Fetch all relevant roles
+            role: { $in: ['Manager', 'head branch manager'] }, // Fetch all relevant roles
             _id: { $nin: assignedManagerIds }
         });
         
@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Error fetching unassigned managers/users', error: error.message }); // Send error message to frontend
     }
 });
+
 router.get('/ma', async (req, res) => {
     try {
         const assignedManagerIds = await Branch.find().distinct('manager');
