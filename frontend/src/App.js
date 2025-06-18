@@ -65,13 +65,11 @@ function App() {
           <Route path="checkout" element={<Checkout />} />
         </Route>
         <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}>
-          <Route path="approve" element={<ApproveUsers />} />
           <Route path="manage" element={<ManageUsers />} />
           <Route path="add-restaurant" element={<AddRestaurant />} />
           <Route path="manage-restaurants" element={<ManageRestaurants />} />
         </Route>
         <Route path="/dashboard/manager" element={<ProtectedRoute requiredRole="manager"><ManagerDashboard /></ProtectedRoute>}>
-          <Route path="revenue" element={<ManagerRevenue />} />
           <Route path="menu" element={<ManagerMenu />} />
           <Route path="bookings" element={<ManagerBookings />} />
         </Route>
@@ -80,9 +78,9 @@ function App() {
           <Route path="revenue" element={<HeadBranchRevenueOverview />} />
           <Route path="graph" element={<HeadBranchMonthlyGraph />} />
         </Route>
-         <Route path="/dashboard/worker" element={<ProtectedRoute requiredRole="worker"><WorkerDashboard/></ProtectedRoute>}> 
+        <Route path="/dashboard/worker" element={<ProtectedRoute requiredRole="worker"><WorkerDashboard /></ProtectedRoute>}>
           <Route index element={<WorkerOrder />} />
-        </Route> 
+        </Route>
       </Routes>
     </Router>
   );
